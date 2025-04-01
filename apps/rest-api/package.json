@@ -26,7 +26,6 @@
     "typescript-eslint": "^8.29.0"
   },
   "dependencies": {
-    "@dental/express-app": "file:../../packages/express-app",
     "@dental/features": "file:../../packages/features",
     "@dental/implementations": "file:../../packages/implementations"
   }

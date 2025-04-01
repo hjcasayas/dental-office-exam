@@ -1,9 +1,9 @@
 import express, { type Response } from 'express';
 
-const app = express();
+const server = express();
 
-app.get('/', (_req, res: Response) => {
+server.get('/', (_req, res: Response) => {
   res.status(200).json({ message: 'express-app works' });
 });
 
-export { app };
+export { server };

@@ -18,5 +18,11 @@
     ],
     "composite": true,
     "declarationMap": true,
+  },
+  "watchOptions": {
+    "excludeDirectories": [
+      "**/node_modules",
+      "dist"
+    ],
   }
 }

@@ -15,7 +15,7 @@
     "typescript-eslint": "^8.29.0"
   },
   "scripts": {
-    "dev": "nodemon --exec 'tsc --build --clean && tsc --build' -e js,ts --ignore node_modules --ignore dist --watch src",
+    "dev": "tsc --watch",
     "prettier:write": "prettier src/**/* --write --ignore-unknown",
     "eslint:fix": "eslint src/**/*.{js,ts} --fix"
   },

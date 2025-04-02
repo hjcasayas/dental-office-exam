@@ -18,11 +18,21 @@
     ],
     "composite": true,
     "declarationMap": true,
+    "paths": {
+      "@/features": [
+        "../features/src/index.ts"
+      ]
+    }
   },
   "watchOptions": {
     "excludeDirectories": [
       "**/node_modules",
       "dist"
     ],
-  }
+  },
+  "references": [
+    {
+      "path": "../features/tsconfig.json"
+    }
+  ]
 }

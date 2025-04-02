@@ -12,10 +12,12 @@
     "prettier": "^3.5.3",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.29.0"
+    "typescript-eslint": "^8.29.0",
+    "vitest": "^3.1.1"
   },
   "scripts": {
     "dev": "tsc --watch",
+    "test": "vitest",
     "prettier:write": "prettier src/**/* --write --ignore-unknown",
     "eslint:fix": "eslint src/**/*.{js,ts} --fix"
   },

@@ -5,6 +5,7 @@
   "type": "module",
   "devDependencies": {
     "@eslint/js": "^9.23.0",
+    "@types/express": "^5.0.1",
     "@types/node": "^22.13.17",
     "eslint": "^9.23.0",
     "globals": "^16.0.0",
@@ -12,8 +13,7 @@
     "prettier": "^3.5.3",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.29.0",
-    "@types/express": "^5.0.1"
+    "typescript-eslint": "^8.29.0"
   },
   "scripts": {
     "dev": "tsc --watch",
@@ -26,7 +26,7 @@
   "types": "./dist/src/index.d.ts",
   "description": "",
   "dependencies": {
-    "@dental/features": "file:../features",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "nanoid": "^5.1.5"
   }
 }

@@ -9,7 +9,7 @@
     "dev:implementations": "npm run dev -w @dental/implementations --if-present",
     "prettier:write:all": "npm run prettier:write --workspaces --if-present",
     "eslint:fix:all": "npm run eslint:fix --workspaces --if-present",
-    "git:commit": "cz"
+    "git:commit": "npm run prettier:write:all && npm run eslint:fix:all && cz"
   },
   "keywords": [],
   "author": "",

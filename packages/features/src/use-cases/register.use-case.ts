@@ -22,9 +22,8 @@ const registerUseCase =
     addUserService,
   }: RegisterUseCaseDependencies): RegisterUseCase =>
   async ({ firstName, lastName, email }) => {
-    console.log({ firstName, lastName, email });
-
     // validate the inputs
+
     const existingUser = await getUserByEmailService({ email });
 
     if (existingUser != null) {

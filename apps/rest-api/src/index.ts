@@ -3,11 +3,7 @@ import {
   server as expressServer,
   getUserByEmailServiceImpl,
 } from '@/implementations';
-import {
-  registerUseCase,
-  getUserByEmailService,
-  addUserService,
-} from '@dental/features';
+import { registerUseCase } from '@dental/features';
 import { createServer } from 'node:http';
 
 main();
@@ -18,8 +14,8 @@ async function main() {
   const server = createServer(
     expressServer({
       registerUseCase: registerUseCase({
-        getUserByEmailService: getUserByEmailService(getUserByEmailServiceImpl),
-        addUserService: addUserService(addUserServiceImpl),
+        getUserByEmailService: getUserByEmailServiceImpl,
+        addUserService: addUserServiceImpl,
       }),
     })
   );

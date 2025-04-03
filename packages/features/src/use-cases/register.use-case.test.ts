@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import { registerUseCase } from './register.use-case.js';
-import type { AddUserService } from '../users/add-user.service.js';
-import type { GetUserByEmailService } from '../users/get-user-by-email.service.js';
+import { type AddUserService } from '../users/add-user.service.js';
+import { type GetUserByEmailService } from '../users/get-user-by-email.service.js';
 
 describe('Implementing dependencies correctly', () => {
   test('Calling the RegisterUseCase once will call the AddUserService and GetUserByEmailService once', async () => {

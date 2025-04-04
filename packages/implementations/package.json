@@ -2,6 +2,7 @@
   "name": "@dental/implementations",
   "version": "1.0.0",
   "exports": {
+    "./express": "./dist/src/express/index.js",
     "./zod": "./dist/src/zod/index.js"
   },
   "type": "module",

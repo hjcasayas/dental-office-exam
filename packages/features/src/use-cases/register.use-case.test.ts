@@ -1,23 +1,31 @@
 import { describe, expect, test, vi } from 'vitest';
-import { registerUseCase } from './register.use-case.js';
+import {
+  registerUseCase,
+  type ParseRegisterUseCaseParams,
+} from './register.use-case.js';
 import { type AddUserService } from '../users/add-user.service.js';
 import { type GetUserByEmailService } from '../users/get-user-by-email.service.js';
+import type { HashPasswordService } from '../utilities/index.js';
 
 describe('Implementing dependencies correctly', () => {
-  test('Calling the RegisterUseCase once will call the AddUserService and GetUserByEmailService once', async () => {
-    let addUserServiceCallCount = 0;
+  test('Calling the RegisterUseCase happy path once will call the dependencies once', async () => {
+    let addUserCallCount = 0;
     let getUserByEmailCallCount = 0;
+    let hashPasswordCallCount = 0;
+    let parseRegisterParamsCallCount = 0;
 
     const firstNameTestParam = 'Henly Jade';
     const lastNameTestParam = 'Casayas';
     const emailTestParam = 'henlyjade.casayas@gmail.com';
+    const passwordTestParam = 'Password@123';
+    const confirmPasswordTestParam = 'Password@123';
 
     const fakeAddUserService: AddUserService = async ({
       email,
       firstName,
       lastName,
     }) => {
-      addUserServiceCallCount++;
+      addUserCallCount++;
       expect(email).toBe(emailTestParam);
       expect(firstName).toBe(firstNameTestParam);
       expect(lastName).toBe(lastNameTestParam);
@@ -31,35 +39,72 @@ describe('Implementing dependencies correctly', () => {
       return null;
     };
 
+    const fakeHashPasswordService: HashPasswordService = ({ password }) => {
+      hashPasswordCallCount++;
+      expect(password).toBe(passwordTestParam);
+      return { hashedPassword: '' };
+    };
+
+    const fakeParseRegisterUseCaseParams: ParseRegisterUseCaseParams = ({
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword,
+    }) => {
+      parseRegisterParamsCallCount++;
+      expect(email).toBe(emailTestParam);
+      expect(firstName).toBe(firstNameTestParam);
+      expect(lastName).toBe(lastNameTestParam);
+      expect(password).toBe(passwordTestParam);
+      expect(confirmPassword).toBe(confirmPasswordTestParam);
+
+      return {
+        success: true,
+        data: { firstName, lastName, email, password, confirmPassword },
+        error: null,
+      };
+    };
+
     const sut = registerUseCase({
-      addUserService: fakeAddUserService,
-      getUserByEmailService: fakeGetUserByEmailService,
+      addUser: fakeAddUserService,
+      getUserByEmail: fakeGetUserByEmailService,
+      hashPassword: fakeHashPasswordService,
+      parseSchema: fakeParseRegisterUseCaseParams,
     });
 
     await sut({
       firstName: firstNameTestParam,
       lastName: lastNameTestParam,
       email: emailTestParam,
+      password: passwordTestParam,
+      confirmPassword: confirmPasswordTestParam,
     });
 
-    expect(addUserServiceCallCount).toBe(1);
+    expect(addUserCallCount).toBe(1);
     expect(getUserByEmailCallCount).toBe(1);
+    expect(hashPasswordCallCount).toBe(1);
+    expect(parseRegisterParamsCallCount).toBe(1);
   });
 
-  test('Calling the RegisterUseCase three times will call the AddUserService and GetUserByEmailService three times', async () => {
-    let addUserServiceCallCount = 0;
+  test('Calling the RegisterUseCase happy path three times will call the dependencies three times', async () => {
+    let addUserCallCount = 0;
     let getUserByEmailCallCount = 0;
+    let hashPasswordCallCount = 0;
+    let parseRegisterParamsCallCount = 0;
 
     const firstNameTestParam = 'Henly Jade';
     const lastNameTestParam = 'Casayas';
     const emailTestParam = 'henlyjade.casayas@gmail.com';
+    const passwordTestParam = 'Password@123';
+    const confirmPasswordTestParam = 'Password@123';
 
     const fakeAddUserService: AddUserService = async ({
       email,
       firstName,
       lastName,
     }) => {
-      addUserServiceCallCount++;
+      addUserCallCount++;
       expect(email).toBe(emailTestParam);
       expect(firstName).toBe(firstNameTestParam);
       expect(lastName).toBe(lastNameTestParam);
@@ -73,31 +118,68 @@ describe('Implementing dependencies correctly', () => {
       return null;
     };
 
+    const fakeHashPasswordService: HashPasswordService = ({ password }) => {
+      hashPasswordCallCount++;
+      expect(password).toBe(passwordTestParam);
+      return { hashedPassword: '' };
+    };
+
+    const fakeParseRegisterUseCaseParams: ParseRegisterUseCaseParams = ({
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword,
+    }) => {
+      parseRegisterParamsCallCount++;
+      expect(email).toBe(emailTestParam);
+      expect(firstName).toBe(firstNameTestParam);
+      expect(lastName).toBe(lastNameTestParam);
+      expect(password).toBe(passwordTestParam);
+      expect(confirmPassword).toBe(confirmPasswordTestParam);
+
+      return {
+        success: true,
+        data: { firstName, lastName, email, password, confirmPassword },
+        error: null,
+      };
+    };
+
     const sut = registerUseCase({
-      addUserService: fakeAddUserService,
-      getUserByEmailService: fakeGetUserByEmailService,
+      addUser: fakeAddUserService,
+      getUserByEmail: fakeGetUserByEmailService,
+      hashPassword: fakeHashPasswordService,
+      parseSchema: fakeParseRegisterUseCaseParams,
     });
 
     await sut({
       firstName: firstNameTestParam,
       lastName: lastNameTestParam,
       email: emailTestParam,
+      password: passwordTestParam,
+      confirmPassword: confirmPasswordTestParam,
     });
 
     await sut({
       firstName: firstNameTestParam,
       lastName: lastNameTestParam,
       email: emailTestParam,
+      password: passwordTestParam,
+      confirmPassword: confirmPasswordTestParam,
     });
 
     await sut({
       firstName: firstNameTestParam,
       lastName: lastNameTestParam,
       email: emailTestParam,
+      password: passwordTestParam,
+      confirmPassword: confirmPasswordTestParam,
     });
 
-    expect(addUserServiceCallCount).toBe(3);
+    expect(addUserCallCount).toBe(3);
     expect(getUserByEmailCallCount).toBe(3);
+    expect(hashPasswordCallCount).toBe(3);
+    expect(parseRegisterParamsCallCount).toBe(3);
   });
 });
 
@@ -106,6 +188,8 @@ describe('Adding User', () => {
     const firstNameTestParam = 'Henly Jade';
     const lastNameTestParam = 'Casayas';
     const emailTestParam = 'henlyjade.casayas@gmail.com';
+    const passwordTestParam = 'Password@123';
+    const confirmPasswordTestParam = 'Password@123';
 
     const fakeAddUserService: AddUserService = async ({
       email,
@@ -128,9 +212,36 @@ describe('Adding User', () => {
       };
     };
 
+    const fakeHashPasswordService: HashPasswordService = ({ password }) => {
+      expect(password).toBe(passwordTestParam);
+      return { hashedPassword: '' };
+    };
+
+    const fakeParseRegisterUseCaseParams: ParseRegisterUseCaseParams = ({
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword,
+    }) => {
+      expect(email).toBe(emailTestParam);
+      expect(firstName).toBe(firstNameTestParam);
+      expect(lastName).toBe(lastNameTestParam);
+      expect(password).toBe(passwordTestParam);
+      expect(confirmPassword).toBe(confirmPasswordTestParam);
+
+      return {
+        success: true,
+        data: { firstName, lastName, email, password, confirmPassword },
+        error: null,
+      };
+    };
+
     const sut = registerUseCase({
-      addUserService: fakeAddUserService,
-      getUserByEmailService: fakeGetUserByEmailService,
+      addUser: fakeAddUserService,
+      getUserByEmail: fakeGetUserByEmailService,
+      hashPassword: fakeHashPasswordService,
+      parseSchema: fakeParseRegisterUseCaseParams,
     });
 
     await expect(async () =>
@@ -138,13 +249,89 @@ describe('Adding User', () => {
         firstName: firstNameTestParam,
         lastName: lastNameTestParam,
         email: emailTestParam,
+        password: passwordTestParam,
+        confirmPassword: confirmPasswordTestParam,
       })
     ).rejects.toThrowError('Email is already registered.');
   });
-  test('Does not throw error when user does not exist', async () => {
+
+  test('Throw validation error when inputs are invalid', async () => {
     const firstNameTestParam = 'Henly Jade';
     const lastNameTestParam = 'Casayas';
     const emailTestParam = 'henlyjade.casayas@gmail.com';
+    const passwordTestParam = 'Password@123';
+    const confirmPasswordTestParam = 'Password@123';
+
+    const fakeAddUserService: AddUserService = async ({
+      email,
+      firstName,
+      lastName,
+    }) => {
+      expect(email).toBe(emailTestParam);
+      expect(firstName).toBe(firstNameTestParam);
+      expect(lastName).toBe(lastNameTestParam);
+    };
+
+    const fakeGetUserByEmailService: GetUserByEmailService = async ({
+      email,
+    }) => {
+      expect(email).toBe(emailTestParam);
+      return {
+        firstName: firstNameTestParam,
+        lastName: lastNameTestParam,
+        email: emailTestParam,
+      };
+    };
+
+    const fakeHashPasswordService: HashPasswordService = ({ password }) => {
+      expect(password).toBe(passwordTestParam);
+      return { hashedPassword: '' };
+    };
+
+    const fakeParseRegisterUseCaseParams: ParseRegisterUseCaseParams = ({
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword,
+    }) => {
+      expect(email).toBe(emailTestParam);
+      expect(firstName).toBe(firstNameTestParam);
+      expect(lastName).toBe(lastNameTestParam);
+      expect(password).toBe(passwordTestParam);
+      expect(confirmPassword).toBe(confirmPasswordTestParam);
+
+      return {
+        success: false,
+        data: null,
+        error: new Error('Validation error.'),
+      };
+    };
+
+    const sut = registerUseCase({
+      addUser: fakeAddUserService,
+      getUserByEmail: fakeGetUserByEmailService,
+      hashPassword: fakeHashPasswordService,
+      parseSchema: fakeParseRegisterUseCaseParams,
+    });
+
+    await expect(async () =>
+      sut({
+        firstName: firstNameTestParam,
+        lastName: lastNameTestParam,
+        email: emailTestParam,
+        password: passwordTestParam,
+        confirmPassword: confirmPasswordTestParam,
+      })
+    ).rejects.toThrowError('Validation error.');
+  });
+
+  test('Adding user succeeds', async () => {
+    const firstNameTestParam = 'Henly Jade';
+    const lastNameTestParam = 'Casayas';
+    const emailTestParam = 'henlyjade.casayas@gmail.com';
+    const passwordTestParam = 'Password@123';
+    const confirmPasswordTestParam = 'Password@123';
 
     const fakeAddUserService: AddUserService = async ({
       email,
@@ -163,9 +350,36 @@ describe('Adding User', () => {
       return null;
     };
 
+    const fakeHashPasswordService: HashPasswordService = ({ password }) => {
+      expect(password).toBe(passwordTestParam);
+      return { hashedPassword: '' };
+    };
+
+    const fakeParseRegisterUseCaseParams: ParseRegisterUseCaseParams = ({
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword,
+    }) => {
+      expect(email).toBe(emailTestParam);
+      expect(firstName).toBe(firstNameTestParam);
+      expect(lastName).toBe(lastNameTestParam);
+      expect(password).toBe(passwordTestParam);
+      expect(confirmPassword).toBe(confirmPasswordTestParam);
+
+      return {
+        success: true,
+        data: { firstName, lastName, email, password, confirmPassword },
+        error: null,
+      };
+    };
+
     const sut = registerUseCase({
-      addUserService: fakeAddUserService,
-      getUserByEmailService: fakeGetUserByEmailService,
+      addUser: fakeAddUserService,
+      getUserByEmail: fakeGetUserByEmailService,
+      hashPassword: fakeHashPasswordService,
+      parseSchema: fakeParseRegisterUseCaseParams,
     });
 
     const sutSpy = vi.fn(sut);
@@ -174,6 +388,8 @@ describe('Adding User', () => {
       firstName: firstNameTestParam,
       lastName: lastNameTestParam,
       email: emailTestParam,
+      password: passwordTestParam,
+      confirmPassword: confirmPasswordTestParam,
     });
 
     expect(sutSpy).toHaveResolved();

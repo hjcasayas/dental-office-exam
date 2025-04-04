@@ -2,6 +2,7 @@ interface AddUserServiceParams {
   firstName: string;
   lastName: string;
   email: string;
+  hashedPassword: string;
 }
 
 type AddUserServiceResult = void;

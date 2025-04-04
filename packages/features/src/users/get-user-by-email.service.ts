@@ -4,7 +4,7 @@ interface GetUserByEmailServiceParams {
   email: string;
 }
 
-type GetUserByEmailServiceResult = UserEntity | null;
+type GetUserByEmailServiceResult = Omit<UserEntity, 'hashedPassword'> | null;
 
 type GetUserByEmailService = (
   params: GetUserByEmailServiceParams

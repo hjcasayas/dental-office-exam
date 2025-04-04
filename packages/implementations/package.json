@@ -1,7 +1,9 @@
 {
   "name": "@dental/implementations",
   "version": "1.0.0",
-  "main": "dist/src/index.js",
+  "exports": {
+    "./zod": "./dist/src/zod/index.js"
+  },
   "type": "module",
   "devDependencies": {
     "@eslint/js": "^9.23.0",
@@ -27,6 +29,6 @@
   "description": "",
   "dependencies": {
     "express": "^5.1.0",
-    "nanoid": "^5.1.5"
+    "zod": "^3.24.2"
   }
 }

@@ -15,15 +15,7 @@
     "outDir": "dist",
     "lib": [
       "es2022"
-    ],
-    "paths": {
-      "@/features": [
-        "../../packages/features/src/index.ts"
-      ],
-      "@/implementations": [
-        "../../packages/implementations/src/index.ts"
-      ]
-    }
+    ]
   },
   "references": [
     {

@@ -5,6 +5,7 @@ import { addUserHandler } from './user/add-user.handler.js';
 import type { RegisterUseCase } from '@/features';
 import { registerUserHandler } from './user/register-user.handler.js';
 import { errorhandler } from './error/error.handler.js';
+import { NotFoundError } from '@dental/features/src/errors/not-found.error.js';
 
 interface Dependencies {
   register: RegisterUseCase;
@@ -14,6 +15,7 @@ const server = ({ register }: Dependencies) => {
   const app = express();
 
   app.use(express.json());
+  app.use(express.urlencoded());
 
   app.get('/', (_req: Request, res: Response) => {
     res.status(200).json({ message: 'express-app works' });
@@ -26,6 +28,10 @@ const server = ({ register }: Dependencies) => {
 
   // Register Routes
   app.post('/api/v1/register', registerUserHandler({ register }));
+
+  app.use(() => {
+    throw new NotFoundError();
+  });
 
   // Error Handler
   app.use(errorhandler());

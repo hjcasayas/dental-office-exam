@@ -1,4 +1,4 @@
-import type { SerializedErrors } from './serialized-error.type.js';
+import type { SerializedError } from './serialized-error.type.js';
 
 export abstract class CustomError extends Error {
   abstract statusCode: number;
@@ -7,5 +7,5 @@ export abstract class CustomError extends Error {
 
     Object.setPrototypeOf(this, CustomError.prototype);
   }
-  abstract serializeErrors: () => SerializedErrors[];
+  abstract serializeErrors: () => SerializedError[];
 }

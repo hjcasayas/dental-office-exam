@@ -2,7 +2,7 @@ import {
   CustomError,
   ReasonPhrases,
   StatusCodes,
-  type SerializedErrors,
+  type SerializedError,
 } from '@dental/features';
 import type { ErrorRequestHandler, Request, Response } from 'express';
 
@@ -10,7 +10,7 @@ function errorhandler(): ErrorRequestHandler {
   return (
     error: Error | CustomError,
     _req: Request,
-    res: Response<{ success: boolean; errors: SerializedErrors[] }>
+    res: Response<{ success: boolean; errors: SerializedError[] }>
   ) => {
     if (error instanceof CustomError) {
       res

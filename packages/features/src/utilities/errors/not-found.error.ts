@@ -1,16 +1,16 @@
-import { ReasonPhrases, StatusCodes } from '../utilities/index.js';
+import { ReasonPhrases, StatusCodes } from '../index.js';
 import { CustomError } from './custom.error.js';
 import type { SerializedError } from './serialized-error.type.js';
 
-export class BadRequestError extends CustomError {
-  statusCode = StatusCodes.BAD_REQUEST;
+export class NotFoundError extends CustomError {
+  statusCode = StatusCodes.NOT_FOUND;
 
   constructor(
     private errors?: SerializedError[],
     message?: string
   ) {
-    super(message ?? ReasonPhrases.BAD_REQUEST);
-    Object.setPrototypeOf(this, BadRequestError.prototype);
+    super(message ?? ReasonPhrases.NOT_FOUND);
+    Object.setPrototypeOf(this, NotFoundError.prototype);
   }
 
   serializeErrors = (): SerializedError[] => {
@@ -18,10 +18,6 @@ export class BadRequestError extends CustomError {
       return this.errors;
     }
 
-    return [
-      {
-        message: ReasonPhrases.BAD_REQUEST,
-      },
-    ];
+    return [{ message: ReasonPhrases.NOT_FOUND }];
   };
 }

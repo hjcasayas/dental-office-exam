@@ -1,11 +1,12 @@
 import express, { type Response, type Request } from 'express';
-import { getAllUsersHandler } from './user/get-all-users.handler.js';
-import { getUserByIdHandler } from './user/get-user-by-id.handler.js';
-import { addUserHandler } from './user/add-user.handler.js';
-import type { RegisterUseCase } from '@/features';
+
+import { NotFoundError, type RegisterUseCase } from '@/features';
+
 import { registerUserHandler } from './user/register-user.handler.js';
+import { getUserByIdHandler } from './user/get-user-by-id.handler.js';
+import { getAllUsersHandler } from './user/get-all-users.handler.js';
+import { addUserHandler } from './user/add-user.handler.js';
 import { errorhandler } from './error/error.handler.js';
-import { NotFoundError } from '@dental/features/src/errors/not-found.error.js';
 
 interface Dependencies {
   register: RegisterUseCase;

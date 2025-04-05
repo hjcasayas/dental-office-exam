@@ -4,11 +4,20 @@ import {
   Server,
   ServerResponse,
 } from 'node:http';
-import { ValidationError } from '@dental/features';
+import {
+  environments,
+  ValidationError,
+  type Environment,
+} from '@dental/features';
 import {
   envConfigSchema,
   parseSchemaZodService,
 } from '@dental/implementations/zod';
+
+import {
+  loggerServiceImpl as winstonLoggerService,
+  createWinstonLogger,
+} from '@dental/implementations/winston';
 
 import type { EnvConfig } from './config.type.js';
 
@@ -37,7 +46,7 @@ if (config == null) {
 
 const { nodeEnv, port } = config;
 
-if (nodeEnv != null && nodeEnv === 'development') {
+if (nodeEnv != null && nodeEnv === environments.dev) {
   console.table({
     env: process.env.NODE_ENV,
     connectionsString: process.env.MONGO_CONNECTION_STRING,
@@ -45,10 +54,16 @@ if (nodeEnv != null && nodeEnv === 'development') {
   });
 }
 
+const log = winstonLoggerService(
+  createWinstonLogger({
+    environment: nodeEnv as Environment,
+  })
+);
+
 server = createServer();
 
 server.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
+  log('info', `Server is listening on port ${port}`);
 });
 
 function getEnvConfig() {
@@ -65,10 +80,10 @@ function getEnvConfig() {
 }
 
 function exitHandler(error: Error, origin: NodeJS.UncaughtExceptionOrigin) {
-  console.table({ error, origin });
+  log('error', error?.message ?? origin);
   if (server != null) {
     server.close(() => {
-      console.log('Server is closed');
+      log('info', 'Server is closed');
       process.exit(1);
     });
   } else {
@@ -77,10 +92,10 @@ function exitHandler(error: Error, origin: NodeJS.UncaughtExceptionOrigin) {
 }
 
 function sigtermHandler(signal: NodeJS.Signals) {
-  console.log(signal);
+  log('error', signal);
   if (server != null) {
     server.close(() => {
-      console.log('Server is closed');
+      log('info', 'Server is closed');
       process.exit(1);
     });
   }

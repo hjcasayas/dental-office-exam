@@ -6,8 +6,10 @@ import {
 import { type AddUserService } from '../users/add-user.service.js';
 import { type GetUserByEmailService } from '../users/get-user-by-email.service.js';
 import {
+  BadRequestError,
   ValidationError,
   type HashPasswordService,
+  type LoggerService,
   type ParseSchemaService,
 } from '../utilities/index.js';
 
@@ -17,6 +19,7 @@ describe('Implementing dependencies correctly', () => {
     let getUserByEmailCallCount = 0;
     let hashPasswordCallCount = 0;
     let parseRegisterParamsCallCount = 0;
+    let loggerCallCount = 0;
 
     const firstNameTestParam = 'Henly Jade';
     const lastNameTestParam = 'Casayas';
@@ -66,11 +69,16 @@ describe('Implementing dependencies correctly', () => {
       };
     };
 
+    const fakeLoggerService: LoggerService = () => {
+      loggerCallCount++;
+    };
+
     const sut = registerUseCase({
       addUser: fakeAddUserService,
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
+      log: fakeLoggerService,
     });
 
     await sut({
@@ -85,6 +93,7 @@ describe('Implementing dependencies correctly', () => {
     expect(getUserByEmailCallCount).toBe(1);
     expect(hashPasswordCallCount).toBe(1);
     expect(parseRegisterParamsCallCount).toBe(1);
+    expect(loggerCallCount).toBe(0);
   });
 
   test('Calling the RegisterUseCase happy path three times will call the dependencies three times', async () => {
@@ -92,6 +101,7 @@ describe('Implementing dependencies correctly', () => {
     let getUserByEmailCallCount = 0;
     let hashPasswordCallCount = 0;
     let parseRegisterParamsCallCount = 0;
+    let loggerCallCount = 0;
 
     const firstNameTestParam = 'Henly Jade';
     const lastNameTestParam = 'Casayas';
@@ -141,11 +151,16 @@ describe('Implementing dependencies correctly', () => {
       };
     };
 
+    const fakeLoggerService: LoggerService = () => {
+      loggerCallCount++;
+    };
+
     const sut = registerUseCase({
       addUser: fakeAddUserService,
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
+      log: fakeLoggerService,
     });
 
     await sut({
@@ -176,16 +191,19 @@ describe('Implementing dependencies correctly', () => {
     expect(getUserByEmailCallCount).toBe(3);
     expect(hashPasswordCallCount).toBe(3);
     expect(parseRegisterParamsCallCount).toBe(3);
+    expect(loggerCallCount).toBe(0);
   });
 });
 
 describe('Adding User', () => {
-  test('Throw error when user exists', async () => {
+  test('Throw error when email already registered', async () => {
     const firstNameTestParam = 'Henly Jade';
     const lastNameTestParam = 'Casayas';
     const emailTestParam = 'henlyjade.casayas@gmail.com';
     const passwordTestParam = 'Password@123';
     const confirmPasswordTestParam = 'Password@123';
+
+    let loggerCallCount = 0;
 
     const fakeAddUserService: AddUserService = async ({
       email,
@@ -229,14 +247,21 @@ describe('Adding User', () => {
       };
     };
 
+    const fakeLoggerService: LoggerService = (level, message) => {
+      loggerCallCount++;
+      expect(level).toBe('error');
+      expect(message).toBe('Email is already registered');
+    };
+
     const sut = registerUseCase({
       addUser: fakeAddUserService,
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
+      log: fakeLoggerService,
     });
 
-    await expect(async () =>
+    await expect(() =>
       sut({
         firstName: firstNameTestParam,
         lastName: lastNameTestParam,
@@ -244,7 +269,11 @@ describe('Adding User', () => {
         password: passwordTestParam,
         confirmPassword: confirmPasswordTestParam,
       })
-    ).rejects.toThrowError();
+    )
+      .rejects.toThrow(BadRequestError)
+      .catch(() => {
+        expect(loggerCallCount).toBe(1);
+      });
   });
 
   test('Throw validation error when inputs are invalid', async () => {
@@ -253,6 +282,7 @@ describe('Adding User', () => {
     const emailTestParam = 'henlyjade.casayas@gmail.com';
     const passwordTestParam = 'Password@123';
     const confirmPasswordTestParam = 'Password@123';
+    let loggerCallCount = 0;
 
     const fakeAddUserService: AddUserService = async ({
       email,
@@ -296,11 +326,18 @@ describe('Adding User', () => {
       };
     };
 
+    const fakeLoggerService: LoggerService = (level, message) => {
+      loggerCallCount++;
+      expect(level).toBe('error');
+      expect(message).toBe('Validation error');
+    };
+
     const sut = registerUseCase({
       addUser: fakeAddUserService,
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
+      log: fakeLoggerService,
     });
 
     await expect(async () =>
@@ -311,7 +348,11 @@ describe('Adding User', () => {
         password: passwordTestParam,
         confirmPassword: confirmPasswordTestParam,
       })
-    ).rejects.toThrowError();
+    )
+      .rejects.toThrow(ValidationError)
+      .catch(() => {
+        expect(loggerCallCount).toBe(1);
+      });
   });
 
   test('Adding user succeeds', async () => {
@@ -320,6 +361,8 @@ describe('Adding User', () => {
     const emailTestParam = 'henlyjade.casayas@gmail.com';
     const passwordTestParam = 'Password@123';
     const confirmPasswordTestParam = 'Password@123';
+
+    let loggerCallCount = 0;
 
     const fakeAddUserService: AddUserService = async ({
       email,
@@ -359,11 +402,16 @@ describe('Adding User', () => {
       };
     };
 
+    const fakeLoggerService: LoggerService = () => {
+      loggerCallCount++;
+    };
+
     const sut = registerUseCase({
       addUser: fakeAddUserService,
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
+      log: fakeLoggerService,
     });
 
     const sutSpy = vi.fn(sut);
@@ -377,5 +425,6 @@ describe('Adding User', () => {
     });
 
     expect(sutSpy).toHaveResolved();
+    expect(loggerCallCount).toBe(0);
   });
 });

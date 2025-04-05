@@ -1,9 +1,11 @@
-export interface ParseSchemaServiceResult<TData, TError> {
+import type { ValidationError } from '../errors/index.js';
+
+export interface ParseSchemaServiceResult<TData> {
   success: boolean;
   data?: TData | null;
-  error?: TError | null;
+  error?: ValidationError | null;
 }
 
-export type ParseSchemaService<TInput, TOutput, TError> = (
-  config: TInput
-) => ParseSchemaServiceResult<TOutput, TError>;
+export type ParseSchemaService<TInput> = (
+  input: TInput
+) => ParseSchemaServiceResult<TInput>;

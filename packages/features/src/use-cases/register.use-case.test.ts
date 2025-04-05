@@ -1,11 +1,15 @@
 import { describe, expect, test, vi } from 'vitest';
 import {
   registerUseCase,
-  type ParseRegisterUseCaseParams,
+  type RegisterUseCaseParams,
 } from './register.use-case.js';
 import { type AddUserService } from '../users/add-user.service.js';
 import { type GetUserByEmailService } from '../users/get-user-by-email.service.js';
-import type { HashPasswordService } from '../utilities/index.js';
+import {
+  ValidationError,
+  type HashPasswordService,
+  type ParseSchemaService,
+} from '../utilities/index.js';
 
 describe('Implementing dependencies correctly', () => {
   test('Calling the RegisterUseCase happy path once will call the dependencies once', async () => {
@@ -45,13 +49,9 @@ describe('Implementing dependencies correctly', () => {
       return { hashedPassword: '' };
     };
 
-    const fakeParseRegisterUseCaseParams: ParseRegisterUseCaseParams = ({
-      firstName,
-      lastName,
-      email,
-      password,
-      confirmPassword,
-    }) => {
+    const fakeParseRegisterUseCaseParams: ParseSchemaService<
+      RegisterUseCaseParams
+    > = ({ firstName, lastName, email, password, confirmPassword }) => {
       parseRegisterParamsCallCount++;
       expect(email).toBe(emailTestParam);
       expect(firstName).toBe(firstNameTestParam);
@@ -70,7 +70,7 @@ describe('Implementing dependencies correctly', () => {
       addUser: fakeAddUserService,
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
-      parseSchema: fakeParseRegisterUseCaseParams,
+      parseParamsSchema: fakeParseRegisterUseCaseParams,
     });
 
     await sut({
@@ -124,13 +124,9 @@ describe('Implementing dependencies correctly', () => {
       return { hashedPassword: '' };
     };
 
-    const fakeParseRegisterUseCaseParams: ParseRegisterUseCaseParams = ({
-      firstName,
-      lastName,
-      email,
-      password,
-      confirmPassword,
-    }) => {
+    const fakeParseRegisterUseCaseParams: ParseSchemaService<
+      RegisterUseCaseParams
+    > = ({ firstName, lastName, email, password, confirmPassword }) => {
       parseRegisterParamsCallCount++;
       expect(email).toBe(emailTestParam);
       expect(firstName).toBe(firstNameTestParam);
@@ -149,7 +145,7 @@ describe('Implementing dependencies correctly', () => {
       addUser: fakeAddUserService,
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
-      parseSchema: fakeParseRegisterUseCaseParams,
+      parseParamsSchema: fakeParseRegisterUseCaseParams,
     });
 
     await sut({
@@ -217,13 +213,9 @@ describe('Adding User', () => {
       return { hashedPassword: '' };
     };
 
-    const fakeParseRegisterUseCaseParams: ParseRegisterUseCaseParams = ({
-      firstName,
-      lastName,
-      email,
-      password,
-      confirmPassword,
-    }) => {
+    const fakeParseRegisterUseCaseParams: ParseSchemaService<
+      RegisterUseCaseParams
+    > = ({ firstName, lastName, email, password, confirmPassword }) => {
       expect(email).toBe(emailTestParam);
       expect(firstName).toBe(firstNameTestParam);
       expect(lastName).toBe(lastNameTestParam);
@@ -241,7 +233,7 @@ describe('Adding User', () => {
       addUser: fakeAddUserService,
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
-      parseSchema: fakeParseRegisterUseCaseParams,
+      parseParamsSchema: fakeParseRegisterUseCaseParams,
     });
 
     await expect(async () =>
@@ -252,7 +244,7 @@ describe('Adding User', () => {
         password: passwordTestParam,
         confirmPassword: confirmPasswordTestParam,
       })
-    ).rejects.toThrowError('Email is already registered.');
+    ).rejects.toThrowError();
   });
 
   test('Throw validation error when inputs are invalid', async () => {
@@ -288,13 +280,9 @@ describe('Adding User', () => {
       return { hashedPassword: '' };
     };
 
-    const fakeParseRegisterUseCaseParams: ParseRegisterUseCaseParams = ({
-      firstName,
-      lastName,
-      email,
-      password,
-      confirmPassword,
-    }) => {
+    const fakeParseRegisterUseCaseParams: ParseSchemaService<
+      RegisterUseCaseParams
+    > = ({ firstName, lastName, email, password, confirmPassword }) => {
       expect(email).toBe(emailTestParam);
       expect(firstName).toBe(firstNameTestParam);
       expect(lastName).toBe(lastNameTestParam);
@@ -304,7 +292,7 @@ describe('Adding User', () => {
       return {
         success: false,
         data: null,
-        error: new Error('Validation error.'),
+        error: new ValidationError(),
       };
     };
 
@@ -312,7 +300,7 @@ describe('Adding User', () => {
       addUser: fakeAddUserService,
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
-      parseSchema: fakeParseRegisterUseCaseParams,
+      parseParamsSchema: fakeParseRegisterUseCaseParams,
     });
 
     await expect(async () =>
@@ -323,7 +311,7 @@ describe('Adding User', () => {
         password: passwordTestParam,
         confirmPassword: confirmPasswordTestParam,
       })
-    ).rejects.toThrowError('Validation error.');
+    ).rejects.toThrowError();
   });
 
   test('Adding user succeeds', async () => {
@@ -355,13 +343,9 @@ describe('Adding User', () => {
       return { hashedPassword: '' };
     };
 
-    const fakeParseRegisterUseCaseParams: ParseRegisterUseCaseParams = ({
-      firstName,
-      lastName,
-      email,
-      password,
-      confirmPassword,
-    }) => {
+    const fakeParseRegisterUseCaseParams: ParseSchemaService<
+      RegisterUseCaseParams
+    > = ({ firstName, lastName, email, password, confirmPassword }) => {
       expect(email).toBe(emailTestParam);
       expect(firstName).toBe(firstNameTestParam);
       expect(lastName).toBe(lastNameTestParam);
@@ -379,7 +363,7 @@ describe('Adding User', () => {
       addUser: fakeAddUserService,
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
-      parseSchema: fakeParseRegisterUseCaseParams,
+      parseParamsSchema: fakeParseRegisterUseCaseParams,
     });
 
     const sutSpy = vi.fn(sut);

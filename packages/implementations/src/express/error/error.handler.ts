@@ -1,6 +1,10 @@
-import { CustomError, type SerializedErrors } from '@dental/features';
+import {
+  CustomError,
+  ReasonPhrases,
+  StatusCodes,
+  type SerializedErrors,
+} from '@dental/features';
 import type { ErrorRequestHandler, Request, Response } from 'express';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 
 function errorhandler(): ErrorRequestHandler {
   return (
@@ -14,12 +18,10 @@ function errorhandler(): ErrorRequestHandler {
         .json({ success: false, errors: error.serializeErrors() });
     }
 
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({
-        success: false,
-        errors: [{ message: ReasonPhrases.INTERNAL_SERVER_ERROR }],
-      });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      errors: [{ message: ReasonPhrases.INTERNAL_SERVER_ERROR }],
+    });
   };
 }
 

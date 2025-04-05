@@ -4,6 +4,7 @@ import { getUserByIdHandler } from './user/get-user-by-id.handler.js';
 import { addUserHandler } from './user/add-user.handler.js';
 import type { RegisterUseCase } from '@/features';
 import { registerUserHandler } from './user/register-user.handler.js';
+import { errorhandler } from './error/error.handler.js';
 
 interface Dependencies {
   register: RegisterUseCase;
@@ -25,6 +26,9 @@ const server = ({ register }: Dependencies) => {
 
   // Register Routes
   app.post('/api/v1/register', registerUserHandler({ register }));
+
+  // Error Handler
+  app.use(errorhandler());
 
   return app;
 };

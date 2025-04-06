@@ -2,7 +2,7 @@ import type { AddUserService } from '@dental/features';
 import { nanoid } from 'nanoid';
 import { type InMemoryDB } from './in-memory.db.js';
 
-export const addUserServiceImpl =
+export const inMemoryAddUserService =
   (inMemoryDB: InMemoryDB): AddUserService =>
   async ({ email, firstName, lastName, hashedPassword }) => {
     const id = nanoid();
@@ -15,6 +15,6 @@ export const addUserServiceImpl =
       createdDate: new Date(),
       updatedDate: new Date(),
     };
-    console.table(inMemoryDB.users);
+
     return;
   };

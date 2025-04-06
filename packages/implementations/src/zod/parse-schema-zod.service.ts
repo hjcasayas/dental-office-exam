@@ -25,7 +25,6 @@ export const parseSchemaZodService =
         });
       });
 
-      console.log({ serializedErrors });
       return {
         success,
         data: null,

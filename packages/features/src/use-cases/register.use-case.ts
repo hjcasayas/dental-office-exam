@@ -52,10 +52,9 @@ function registerUseCase({
     const existingUser = await getUserByEmail({ email });
 
     if (existingUser != null) {
-      const badRequestError = new BadRequestError(
-        [],
-        'Email is already registered'
-      );
+      const badRequestError = new BadRequestError([
+        { message: 'Email is already registered', field: 'email' },
+      ]);
       log('error', `${badRequestError.message}: ${existingUser.email}`);
       throw badRequestError;
     }

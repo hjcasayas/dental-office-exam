@@ -111,7 +111,7 @@ server = createServer(
 );
 
 server.listen(port, () => {
-  winstonLoggerService.log('info', `Server is listening on port ${port}`);
+  winstonLoggerService.log('info', `Server is listening on port ${port}.`);
 });
 
 function getEnvConfig() {
@@ -128,10 +128,10 @@ function getEnvConfig() {
 }
 
 function exitHandler(error: Error, origin: NodeJS.UncaughtExceptionOrigin) {
-  winstonLoggerService.log('error', error?.message ?? origin);
+  winstonLoggerService.log('error', `${error?.message ?? origin}.`);
   if (server != null) {
     server.close(() => {
-      winstonLoggerService.log('info', 'Server is closed');
+      winstonLoggerService.log('info', 'Server is closed.');
       process.exit(1);
     });
   } else {
@@ -140,10 +140,10 @@ function exitHandler(error: Error, origin: NodeJS.UncaughtExceptionOrigin) {
 }
 
 function sigtermHandler(signal: NodeJS.Signals) {
-  winstonLoggerService.log('error', signal);
+  winstonLoggerService.log('error', `${signal}.`);
   if (server != null) {
     server.close(() => {
-      winstonLoggerService.log('info', 'Server is closed');
+      winstonLoggerService.log('info', 'Server is closed.');
       process.exit(1);
     });
   }

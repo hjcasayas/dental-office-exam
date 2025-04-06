@@ -76,7 +76,7 @@ describe('Implementing dependencies correctly', () => {
         loggerCallCount++;
         expect(level).toBe('info');
         expect(message).toBe(
-          `Successfully registered user with email: ${emailTestParam}`
+          `Successfully registered user with email: ${emailTestParam}.`
         );
       },
     };
@@ -166,7 +166,7 @@ describe('Implementing dependencies correctly', () => {
         loggerCallCount++;
         expect(level).toBe('info');
         expect(message).toBe(
-          `Successfully registered user with email: ${emailTestParam}`
+          `Successfully registered user with email: ${emailTestParam}.`
         );
       },
     };
@@ -433,7 +433,7 @@ describe('Adding User', () => {
         loggerCallCount++;
         expect(level).toBe('info');
         expect(message).toBe(
-          `Successfully registered user with email: ${emailTestParam}`
+          `Successfully registered user with email: ${emailTestParam}.`
         );
       },
     };

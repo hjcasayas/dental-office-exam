@@ -61,7 +61,7 @@ function registerUseCase({
 
     const { hashedPassword } = await hashPassword({ password });
 
-    logger.log('info', `Successfully registered user with email: ${email}`);
+    logger.log('info', `Successfully registered user with email: ${email}.`);
     await addUser({ firstName, lastName, email, hashedPassword });
     return;
   };

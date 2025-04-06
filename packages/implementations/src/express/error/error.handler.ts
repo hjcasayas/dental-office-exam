@@ -32,7 +32,7 @@ function errorhandler(): ErrorRequestHandler {
 
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: error.message,
+      message: error.message ?? ReasonPhrases.INTERNAL_SERVER_ERROR,
       errors: [{ message: ReasonPhrases.INTERNAL_SERVER_ERROR }],
     });
     next();

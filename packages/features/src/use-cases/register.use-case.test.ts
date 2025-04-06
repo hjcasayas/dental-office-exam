@@ -71,8 +71,14 @@ describe('Implementing dependencies correctly', () => {
       };
     };
 
-    const fakeLoggerService: LoggerService = () => {
-      loggerCallCount++;
+    const fakeLoggerService: LoggerService = {
+      log: (level, message) => {
+        loggerCallCount++;
+        expect(level).toBe('info');
+        expect(message).toBe(
+          `Successfully registered user with email: ${emailTestParam}`
+        );
+      },
     };
 
     const sut = registerUseCase({
@@ -80,7 +86,7 @@ describe('Implementing dependencies correctly', () => {
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
-      log: fakeLoggerService,
+      logger: fakeLoggerService,
     });
 
     await sut({
@@ -95,7 +101,7 @@ describe('Implementing dependencies correctly', () => {
     expect(getUserByEmailCallCount).toBe(1);
     expect(hashPasswordCallCount).toBe(1);
     expect(parseRegisterParamsCallCount).toBe(1);
-    expect(loggerCallCount).toBe(0);
+    expect(loggerCallCount).toBe(1);
   });
 
   test('Calling the RegisterUseCase happy path three times will call the dependencies three times', async () => {
@@ -155,8 +161,14 @@ describe('Implementing dependencies correctly', () => {
       };
     };
 
-    const fakeLoggerService: LoggerService = () => {
-      loggerCallCount++;
+    const fakeLoggerService: LoggerService = {
+      log: (level, message) => {
+        loggerCallCount++;
+        expect(level).toBe('info');
+        expect(message).toBe(
+          `Successfully registered user with email: ${emailTestParam}`
+        );
+      },
     };
 
     const sut = registerUseCase({
@@ -164,7 +176,7 @@ describe('Implementing dependencies correctly', () => {
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
-      log: fakeLoggerService,
+      logger: fakeLoggerService,
     });
 
     await sut({
@@ -195,7 +207,7 @@ describe('Implementing dependencies correctly', () => {
     expect(getUserByEmailCallCount).toBe(3);
     expect(hashPasswordCallCount).toBe(3);
     expect(parseRegisterParamsCallCount).toBe(3);
-    expect(loggerCallCount).toBe(0);
+    expect(loggerCallCount).toBe(3);
   });
 });
 
@@ -253,10 +265,12 @@ describe('Adding User', () => {
       };
     };
 
-    const fakeLoggerService: LoggerService = (level, message) => {
-      loggerCallCount++;
-      expect(level).toBe('error');
-      expect(message).toBe('Email is already registered');
+    const fakeLoggerService: LoggerService = {
+      log: (level, message) => {
+        loggerCallCount++;
+        expect(level).toBe('error');
+        expect(message).toBe('Email is already registered');
+      },
     };
 
     const sut = registerUseCase({
@@ -264,7 +278,7 @@ describe('Adding User', () => {
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
-      log: fakeLoggerService,
+      logger: fakeLoggerService,
     });
 
     await expect(() =>
@@ -334,10 +348,12 @@ describe('Adding User', () => {
       };
     };
 
-    const fakeLoggerService: LoggerService = (level, message) => {
-      loggerCallCount++;
-      expect(level).toBe('error');
-      expect(message).toBe('Validation error');
+    const fakeLoggerService: LoggerService = {
+      log: (level, message) => {
+        loggerCallCount++;
+        expect(level).toBe('error');
+        expect(message).toBe('Validation error');
+      },
     };
 
     const sut = registerUseCase({
@@ -345,7 +361,7 @@ describe('Adding User', () => {
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
-      log: fakeLoggerService,
+      logger: fakeLoggerService,
     });
 
     await expect(async () =>
@@ -412,8 +428,14 @@ describe('Adding User', () => {
       };
     };
 
-    const fakeLoggerService: LoggerService = () => {
-      loggerCallCount++;
+    const fakeLoggerService: LoggerService = {
+      log: (level, message) => {
+        loggerCallCount++;
+        expect(level).toBe('info');
+        expect(message).toBe(
+          `Successfully registered user with email: ${emailTestParam}`
+        );
+      },
     };
 
     const sut = registerUseCase({
@@ -421,7 +443,7 @@ describe('Adding User', () => {
       getUserByEmail: fakeGetUserByEmailService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
-      log: fakeLoggerService,
+      logger: fakeLoggerService,
     });
 
     const sutSpy = vi.fn(sut);
@@ -435,6 +457,6 @@ describe('Adding User', () => {
     });
 
     expect(sutSpy).toHaveResolved();
-    expect(loggerCallCount).toBe(0);
+    expect(loggerCallCount).toBe(1);
   });
 });

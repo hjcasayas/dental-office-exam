@@ -1,2 +1,2 @@
-export * from './logger.service.js';
-export * from './winston-logger.js';
+export * from './create-winston-logger.service.js';
+export * from './get-winston-logger-options.js';

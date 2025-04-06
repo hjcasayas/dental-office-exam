@@ -9,6 +9,7 @@ import {
   registerUseCase,
   ValidationError,
   type Environment,
+  type LoggerService,
   type RegisterUseCase,
 } from '@dental/features';
 import {
@@ -17,8 +18,8 @@ import {
 } from '@dental/implementations/zod';
 
 import {
-  loggerServiceImpl as winstonLoggerService,
-  createWinstonLogger,
+  createWinstonLoggerService,
+  getWinstonLoggerServiceOptions,
 } from '@dental/implementations/winston';
 
 import { server as expressServer } from '@dental/implementations/express';
@@ -33,11 +34,10 @@ import {
   inMemoryAddUserService,
 } from '@dental/implementations/in-memory';
 import {
-  createMorganRequestLogger,
+  createMorganRequestLoggerService,
   getMorganLogsFormat,
 } from '@dental/implementations/morgan';
-import path, { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
 import { createWriteStream, existsSync, WriteStream } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 
@@ -76,37 +76,34 @@ if (nodeEnv != null && nodeEnv === environments.dev) {
 
 const environment: Environment = nodeEnv as Environment;
 
-const log = winstonLoggerService(
-  createWinstonLogger({
-    environment,
-  })
-);
+const winstonLoggerService: LoggerService = createWinstonLoggerService({
+  options: getWinstonLoggerServiceOptions(environment),
+});
 
 const register: RegisterUseCase = registerUseCase({
   parseParamsSchema: parseSchemaZodService(registerUseCaseParamsSchema),
   getUserByEmail: inMemoryGetUserByEmailService(inMemoryDB),
   hashPassword: bcryptHashPasswordService(),
   addUser: inMemoryAddUserService(inMemoryDB),
-  log,
+  logger: winstonLoggerService,
 });
 
-const successStream = await createWritableStream('success.log');
-const errorStream = await createWritableStream('error.log');
+const accessLogStream = await createWritableStream('logs/access.log');
 
 server = createServer(
   expressServer({
     register,
-    successRequestLogger: createMorganRequestLogger({
+    successRequestLogger: createMorganRequestLoggerService({
       format: getMorganLogsFormat(environment),
       options: {
-        stream: successStream,
+        stream: accessLogStream,
         skip: (req, res) => res.statusCode >= 400,
       },
     }),
-    errorRequestLogger: createMorganRequestLogger({
+    errorRequestLogger: createMorganRequestLoggerService({
       format: getMorganLogsFormat(environment),
       options: {
-        stream: errorStream,
+        stream: accessLogStream,
         skip: (req, res) => res.statusCode < 400,
       },
     }),
@@ -114,7 +111,7 @@ server = createServer(
 );
 
 server.listen(port, () => {
-  log('info', `Server is listening on port ${port}`);
+  winstonLoggerService.log('info', `Server is listening on port ${port}`);
 });
 
 function getEnvConfig() {
@@ -131,10 +128,10 @@ function getEnvConfig() {
 }
 
 function exitHandler(error: Error, origin: NodeJS.UncaughtExceptionOrigin) {
-  log('error', error?.message ?? origin);
+  winstonLoggerService.log('error', error?.message ?? origin);
   if (server != null) {
     server.close(() => {
-      log('info', 'Server is closed');
+      winstonLoggerService.log('info', 'Server is closed');
       process.exit(1);
     });
   } else {
@@ -143,10 +140,10 @@ function exitHandler(error: Error, origin: NodeJS.UncaughtExceptionOrigin) {
 }
 
 function sigtermHandler(signal: NodeJS.Signals) {
-  log('error', signal);
+  winstonLoggerService.log('error', signal);
   if (server != null) {
     server.close(() => {
-      log('info', 'Server is closed');
+      winstonLoggerService.log('info', 'Server is closed');
       process.exit(1);
     });
   }
@@ -158,16 +155,7 @@ async function createDirForFile(filePath: string): Promise<void> {
   }
 }
 
-function createLogPath(fileName: string): string {
-  return path.resolve(
-    fileURLToPath(import.meta.url),
-    '../../',
-    `logs/${fileName}`
-  );
-}
-
-async function createWritableStream(fileName: string): Promise<WriteStream> {
-  const filePath = createLogPath(fileName);
+async function createWritableStream(filePath: string): Promise<WriteStream> {
   await createDirForFile(filePath);
   return createWriteStream(filePath, { flags: 'a' });
 }

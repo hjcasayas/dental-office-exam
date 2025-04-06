@@ -1,4 +1,3 @@
-import { log } from 'console';
 import type { AddUserService, GetUserByEmailService } from '../users/index.js';
 import { ValidationError } from '../utilities/errors/validation.error.js';
 import {
@@ -21,7 +20,7 @@ interface RegisterUseCaseDependencies {
   getUserByEmail: GetUserByEmailService;
   hashPassword: HashPasswordService;
   addUser: AddUserService;
-  log: LoggerService;
+  logger: LoggerService;
 }
 
 type RegisterUseCase = (params: RegisterUseCaseParams) => Promise<void>;
@@ -31,18 +30,19 @@ function registerUseCase({
   getUserByEmail,
   hashPassword,
   addUser,
+  logger,
 }: RegisterUseCaseDependencies): RegisterUseCase {
   return async (params) => {
     const { success, data, error } = parseParamsSchema(params);
 
     if (!success || data == null) {
       const validationError = error ?? new ValidationError();
-      log(
+      logger.log(
         'error',
-        validationError
+        `${validationError.message}: ${params?.email ?? params?.firstName ?? params?.lastName}: ${validationError
           .serializeErrors()
           .map((error) => error.message)
-          .join(', ')
+          .join(', ')}.`
       );
       throw validationError;
     }
@@ -55,13 +55,13 @@ function registerUseCase({
       const badRequestError = new BadRequestError([
         { message: 'Email is already registered', field: 'email' },
       ]);
-      log('error', `${badRequestError.message}: ${existingUser.email}`);
+      logger.log('error', `${badRequestError.message}: ${existingUser.email}`);
       throw badRequestError;
     }
 
     const { hashedPassword } = await hashPassword({ password });
 
-    log('info', `Successfully registered user with email: ${email}`);
+    logger.log('info', `Successfully registered user with email: ${email}`);
     await addUser({ firstName, lastName, email, hashedPassword });
     return;
   };

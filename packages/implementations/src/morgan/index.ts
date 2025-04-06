@@ -1,2 +1,2 @@
-import morgan from 'morgan';
-export const morganLogger = morgan('combined');
+export * from './create-morgan-request-logger.service.js';
+export * from './get-morgan-logs-format.js';

@@ -7,7 +7,8 @@
     "./zod": "./dist/src/zod/index.js",
     "./winston": "./dist/src/winston/index.js",
     "./in-memory": "./dist/src/in-memory/index.js",
-    "./bcrypt": "./dist/src/bcrypt/index.js"
+    "./bcrypt": "./dist/src/bcrypt/index.js",
+    "./morgan": "./dist/src/morgan/index.js"
   },
   "type": "module",
   "devDependencies": {

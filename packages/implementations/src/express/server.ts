@@ -1,22 +1,32 @@
 import express, { type Response, type Request } from 'express';
 
-import { NotFoundError, type RegisterUseCase } from '@dental/features';
+import {
+  NotFoundError,
+  type RegisterUseCase,
+  type RequestLoggerService,
+} from '@dental/features';
 
 import { registerUserHandler } from './user/register-user.handler.js';
 import { getUserByIdHandler } from './user/get-user-by-id.handler.js';
 import { getAllUsersHandler } from './user/get-all-users.handler.js';
 import { addUserHandler } from './user/add-user.handler.js';
 import { errorhandler } from './error/error.handler.js';
-import { morganLogger } from '../morgan/index.js';
 
 interface Dependencies {
   register: RegisterUseCase;
+  successRequestLogger: RequestLoggerService;
+  errorRequestLogger: RequestLoggerService;
 }
 
-const server = ({ register }: Dependencies) => {
+const server = ({
+  register,
+  successRequestLogger,
+  errorRequestLogger,
+}: Dependencies) => {
   const app = express();
 
-  app.use(morganLogger);
+  app.use(successRequestLogger);
+  app.use(errorRequestLogger);
   app.use(express.json());
   app.use(express.urlencoded());
 

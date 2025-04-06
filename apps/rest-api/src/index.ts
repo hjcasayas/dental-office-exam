@@ -32,6 +32,14 @@ import {
   inMemoryDB,
   inMemoryAddUserService,
 } from '@dental/implementations/in-memory';
+import {
+  createMorganRequestLogger,
+  getMorganLogsFormat,
+} from '@dental/implementations/morgan';
+import path, { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createWriteStream, existsSync, WriteStream } from 'node:fs';
+import { mkdir } from 'node:fs/promises';
 
 let server: Server<
   typeof IncomingMessage,
@@ -66,9 +74,11 @@ if (nodeEnv != null && nodeEnv === environments.dev) {
   });
 }
 
+const environment: Environment = nodeEnv as Environment;
+
 const log = winstonLoggerService(
   createWinstonLogger({
-    environment: nodeEnv as Environment,
+    environment,
   })
 );
 
@@ -80,7 +90,28 @@ const register: RegisterUseCase = registerUseCase({
   log,
 });
 
-server = createServer(expressServer({ register }));
+const successStream = await createWritableStream('success.log');
+const errorStream = await createWritableStream('error.log');
+
+server = createServer(
+  expressServer({
+    register,
+    successRequestLogger: createMorganRequestLogger({
+      format: getMorganLogsFormat(environment),
+      options: {
+        stream: successStream,
+        skip: (req, res) => res.statusCode >= 400,
+      },
+    }),
+    errorRequestLogger: createMorganRequestLogger({
+      format: getMorganLogsFormat(environment),
+      options: {
+        stream: errorStream,
+        skip: (req, res) => res.statusCode < 400,
+      },
+    }),
+  })
+);
 
 server.listen(port, () => {
   log('info', `Server is listening on port ${port}`);
@@ -119,4 +150,24 @@ function sigtermHandler(signal: NodeJS.Signals) {
       process.exit(1);
     });
   }
+}
+
+async function createDirForFile(filePath: string): Promise<void> {
+  if (!existsSync(dirname(filePath))) {
+    await mkdir(dirname(filePath));
+  }
+}
+
+function createLogPath(fileName: string): string {
+  return path.resolve(
+    fileURLToPath(import.meta.url),
+    '../../',
+    `logs/${fileName}`
+  );
+}
+
+async function createWritableStream(fileName: string): Promise<WriteStream> {
+  const filePath = createLogPath(fileName);
+  await createDirForFile(filePath);
+  return createWriteStream(filePath, { flags: 'a' });
 }

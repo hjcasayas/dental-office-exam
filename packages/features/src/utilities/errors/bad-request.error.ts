@@ -6,8 +6,8 @@ export class BadRequestError extends CustomError {
   statusCode = StatusCodes.BAD_REQUEST;
   errors: SerializedError[];
 
-  constructor(errors?: SerializedError[], message?: string) {
-    super(message ?? ReasonPhrases.BAD_REQUEST);
+  constructor(errors?: SerializedError[]) {
+    super(ReasonPhrases.BAD_REQUEST);
     this.errors = errors ?? [];
 
     Object.setPrototypeOf(this, BadRequestError.prototype);

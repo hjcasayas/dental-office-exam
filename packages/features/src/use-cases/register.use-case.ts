@@ -37,7 +37,13 @@ function registerUseCase({
 
     if (!success || data == null) {
       const validationError = error ?? new ValidationError();
-      log('error', validationError.message);
+      log(
+        'error',
+        validationError
+          .serializeErrors()
+          .map((error) => error.message)
+          .join(', ')
+      );
       throw validationError;
     }
 
@@ -50,11 +56,11 @@ function registerUseCase({
         [],
         'Email is already registered'
       );
-      log('error', badRequestError.message);
+      log('error', `${badRequestError.message}: ${existingUser.email}`);
       throw badRequestError;
     }
 
-    const { hashedPassword } = hashPassword({ password });
+    const { hashedPassword } = await hashPassword({ password });
 
     await addUser({ firstName, lastName, email, hashedPassword });
     return;

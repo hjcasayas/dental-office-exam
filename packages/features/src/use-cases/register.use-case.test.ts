@@ -46,7 +46,9 @@ describe('Implementing dependencies correctly', () => {
       return null;
     };
 
-    const fakeHashPasswordService: HashPasswordService = ({ password }) => {
+    const fakeHashPasswordService: HashPasswordService = async ({
+      password,
+    }) => {
       hashPasswordCallCount++;
       expect(password).toBe(passwordTestParam);
       return { hashedPassword: '' };
@@ -128,7 +130,9 @@ describe('Implementing dependencies correctly', () => {
       return null;
     };
 
-    const fakeHashPasswordService: HashPasswordService = ({ password }) => {
+    const fakeHashPasswordService: HashPasswordService = async ({
+      password,
+    }) => {
       hashPasswordCallCount++;
       expect(password).toBe(passwordTestParam);
       return { hashedPassword: '' };
@@ -226,7 +230,9 @@ describe('Adding User', () => {
       };
     };
 
-    const fakeHashPasswordService: HashPasswordService = ({ password }) => {
+    const fakeHashPasswordService: HashPasswordService = async ({
+      password,
+    }) => {
       expect(password).toBe(passwordTestParam);
       return { hashedPassword: '' };
     };
@@ -305,7 +311,9 @@ describe('Adding User', () => {
       };
     };
 
-    const fakeHashPasswordService: HashPasswordService = ({ password }) => {
+    const fakeHashPasswordService: HashPasswordService = async ({
+      password,
+    }) => {
       expect(password).toBe(passwordTestParam);
       return { hashedPassword: '' };
     };
@@ -381,7 +389,9 @@ describe('Adding User', () => {
       return null;
     };
 
-    const fakeHashPasswordService: HashPasswordService = ({ password }) => {
+    const fakeHashPasswordService: HashPasswordService = async ({
+      password,
+    }) => {
       expect(password).toBe(passwordTestParam);
       return { hashedPassword: '' };
     };

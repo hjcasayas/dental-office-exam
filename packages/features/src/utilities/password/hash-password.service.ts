@@ -8,4 +8,4 @@ export interface HashPasswordServiceResult {
 
 export type HashPasswordService = (
   params: HashPasswordServiceParams
-) => HashPasswordServiceResult;
+) => Promise<HashPasswordServiceResult>;

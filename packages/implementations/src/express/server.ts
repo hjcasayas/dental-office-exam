@@ -1,12 +1,13 @@
 import express, { type Response, type Request } from 'express';
 
-import { NotFoundError, type RegisterUseCase } from '@/features';
+import { NotFoundError, type RegisterUseCase } from '@dental/features';
 
 import { registerUserHandler } from './user/register-user.handler.js';
 import { getUserByIdHandler } from './user/get-user-by-id.handler.js';
 import { getAllUsersHandler } from './user/get-all-users.handler.js';
 import { addUserHandler } from './user/add-user.handler.js';
 import { errorhandler } from './error/error.handler.js';
+import { morganLogger } from '../morgan/index.js';
 
 interface Dependencies {
   register: RegisterUseCase;
@@ -15,6 +16,7 @@ interface Dependencies {
 const server = ({ register }: Dependencies) => {
   const app = express();
 
+  app.use(morganLogger);
   app.use(express.json());
   app.use(express.urlencoded());
 

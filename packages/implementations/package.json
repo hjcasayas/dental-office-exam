@@ -5,12 +5,16 @@
     "./mongo": "./dist/src/mongo/index.js",
     "./express": "./dist/src/express/index.js",
     "./zod": "./dist/src/zod/index.js",
-    "./winston": "./dist/src/winston/index.js"
+    "./winston": "./dist/src/winston/index.js",
+    "./in-memory": "./dist/src/in-memory/index.js",
+    "./bcrypt": "./dist/src/bcrypt/index.js"
   },
   "type": "module",
   "devDependencies": {
     "@eslint/js": "^9.23.0",
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.1",
+    "@types/morgan": "^1.9.9",
     "@types/node": "^22.13.17",
     "eslint": "^9.23.0",
     "globals": "^16.0.0",
@@ -31,8 +35,10 @@
   "types": "./dist/src/index.d.ts",
   "description": "",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "express": "^5.1.0",
     "mongoose": "^8.13.2",
+    "morgan": "^1.10.0",
     "winston": "^3.17.0",
     "zod": "^3.24.2"
   }

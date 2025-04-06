@@ -25,7 +25,9 @@
     "typescript-eslint": "^8.29.0"
   },
   "scripts": {
-    "dev": "tsc --watch",
+    "watch": "tsc --watch",
+    "clean": "tsc --build --clean",
+    "build": "tsc --build --clean && tsc --build",
     "prettier:write": "prettier src/**/* --write --ignore-unknown",
     "eslint:fix": "eslint src/**/*.{js,ts} --fix"
   },

@@ -4,7 +4,7 @@ import type { SerializedError } from './serialized-error.type.js';
 
 export class BadRequestError extends CustomError {
   statusCode = StatusCodes.BAD_REQUEST;
-  errors: SerializedError[];
+  private errors: SerializedError[];
 
   constructor(errors?: SerializedError[]) {
     super(ReasonPhrases.BAD_REQUEST);

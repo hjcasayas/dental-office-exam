@@ -37,13 +37,6 @@ function registerUseCase({
 
     if (!success || data == null) {
       const validationError = error ?? new ValidationError();
-      logger.log(
-        'error',
-        `${validationError.message}: ${params?.email ?? params?.firstName ?? params?.lastName}: ${validationError
-          .serializeErrors()
-          .map((error) => error.message)
-          .join(', ')}.`
-      );
       throw validationError;
     }
 
@@ -53,16 +46,15 @@ function registerUseCase({
 
     if (existingUser != null) {
       const badRequestError = new BadRequestError([
-        { message: 'Email is already registered', field: 'email' },
+        { message: `Email is already registered: ${email}`, field: 'email' },
       ]);
-      logger.log('error', `${badRequestError.message}: ${existingUser.email}`);
       throw badRequestError;
     }
 
     const { hashedPassword } = await hashPassword({ password });
 
-    logger.log('info', `Successfully registered user with email: ${email}.`);
     await addUser({ firstName, lastName, email, hashedPassword });
+    logger.log('info', `Successfully registered user with email: ${email}.`);
     return;
   };
 }

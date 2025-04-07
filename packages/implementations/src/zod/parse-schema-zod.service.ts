@@ -1,9 +1,6 @@
-import {
-  ValidationError,
-  type ParseSchemaService,
-  type SerializedError,
-} from '@dental/features';
+import { ValidationError, type ParseSchemaService } from '@dental/features';
 import { Schema } from 'zod';
+import { serializedZodError } from './serialized-zod-errors.js';
 
 export const parseSchemaZodService =
   <TInput>(zodSchema: Schema<TInput>): ParseSchemaService<TInput> =>
@@ -15,15 +12,7 @@ export const parseSchemaZodService =
     }
 
     if (!success && error != null) {
-      const serializedErrors: SerializedError[] = [];
-
-      const errorEntries = Object.entries(error.flatten().fieldErrors);
-      errorEntries.forEach((error) => {
-        serializedErrors.push({
-          field: error[0],
-          message: (error[1] as string[]).join(', '),
-        });
-      });
+      const serializedErrors = serializedZodError(error);
 
       return {
         success,

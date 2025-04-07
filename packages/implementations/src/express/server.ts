@@ -2,6 +2,7 @@ import express, { type Response, type Request } from 'express';
 
 import {
   NotFoundError,
+  type LoggerService,
   type RegisterUseCase,
   type RequestLoggerService,
 } from '@dental/features';
@@ -16,12 +17,14 @@ interface Dependencies {
   register: RegisterUseCase;
   successRequestLogger: RequestLoggerService;
   errorRequestLogger: RequestLoggerService;
+  logger: LoggerService;
 }
 
 const server = ({
   register,
   successRequestLogger,
   errorRequestLogger,
+  logger,
 }: Dependencies) => {
   const app = express();
 
@@ -47,7 +50,7 @@ const server = ({
   });
 
   // Error Handler
-  app.use(errorhandler());
+  app.use(errorhandler({ logger }));
 
   return app;
 };

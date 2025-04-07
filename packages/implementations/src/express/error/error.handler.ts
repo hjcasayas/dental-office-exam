@@ -2,6 +2,7 @@ import {
   CustomError,
   ReasonPhrases,
   StatusCodes,
+  type LoggerService,
   type SerializedError,
 } from '@dental/features';
 import type {
@@ -11,7 +12,11 @@ import type {
   Response,
 } from 'express';
 
-function errorhandler(): ErrorRequestHandler {
+function errorhandler({
+  logger,
+}: {
+  logger: LoggerService;
+}): ErrorRequestHandler {
   return (
     error: Error | CustomError,
     _req: Request,
@@ -20,13 +25,17 @@ function errorhandler(): ErrorRequestHandler {
       message: string;
       errors: SerializedError[];
     }>,
-    next: NextFunction
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _next: NextFunction
   ) => {
     if (error instanceof CustomError) {
-      res.locals.errorMessage = `${error.message}: ${error
+      const errorMessage = `${error.message}: ${error
         .serializeErrors()
         .map((error) => error.message)
         .join(', ')}.`;
+      res.locals.errorMessage = errorMessage;
+      logger.log('error', error.toLogs());
+
       res.status(error.statusCode).json({
         success: false,
         message: error.message,
@@ -35,13 +44,14 @@ function errorhandler(): ErrorRequestHandler {
     } else {
       res.locals.errorMessage =
         error?.message ?? ReasonPhrases.INTERNAL_SERVER_ERROR;
+      logger.log('error', `${error.message}.`);
+
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: error.message ?? ReasonPhrases.INTERNAL_SERVER_ERROR,
         errors: [{ message: ReasonPhrases.INTERNAL_SERVER_ERROR }],
       });
     }
-    next();
   };
 }
 

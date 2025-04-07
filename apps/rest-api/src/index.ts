@@ -31,7 +31,7 @@ import { bcryptHashPasswordService } from '@dental/implementations/bcrypt';
 import {
   createMongoConnection,
   mongoAddUserService,
-  mongoGetUserByEmailService,
+  mongoIsEmailAlreadyTakenService,
 } from '@dental/implementations/mongo';
 
 import {
@@ -83,7 +83,7 @@ await createMongoConnection(`${mongoConnectionString}/${mongoDB}`);
 
 const register: RegisterUseCase = registerUseCase({
   parseParamsSchema: parseSchemaZodService(registerUseCaseParamsSchema),
-  getUserByEmail: mongoGetUserByEmailService(),
+  isEmailAlreadyTaken: mongoIsEmailAlreadyTakenService(),
   hashPassword: bcryptHashPasswordService(),
   addUser: mongoAddUserService(),
   logger: winstonLoggerService,

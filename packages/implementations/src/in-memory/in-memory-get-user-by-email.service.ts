@@ -1,20 +1,20 @@
-import type { GetUserByEmailService, UserEntity } from '@dental/features';
+import type { IsEmailAlreadyTakenService } from '@dental/features';
 import { type InMemoryDB } from './in-memory.db.js';
 
 export const inMemoryGetUserByEmailService =
-  (db: InMemoryDB): GetUserByEmailService =>
+  (db: InMemoryDB): IsEmailAlreadyTakenService =>
   async ({ email }) => {
-    let user: UserEntity | null = null;
+    let isTaken = false;
     const users = db.users;
     for (const key in users) {
       if (Object.prototype.hasOwnProperty.call(users, key)) {
         const currentUser = users[key];
         if (currentUser?.email === email) {
-          user = currentUser;
+          isTaken = true;
           break;
         }
       }
     }
 
-    return user;
+    return isTaken;
   };

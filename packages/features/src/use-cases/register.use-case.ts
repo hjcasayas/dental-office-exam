@@ -1,4 +1,7 @@
-import type { AddUserService, GetUserByEmailService } from '../users/index.js';
+import type {
+  AddUserService,
+  IsEmailAlreadyTakenService,
+} from '../users/index.js';
 import { ValidationError } from '../utilities/errors/validation.error.js';
 import {
   BadRequestError,
@@ -17,7 +20,7 @@ interface RegisterUseCaseParams {
 
 interface RegisterUseCaseDependencies {
   parseParamsSchema: ParseSchemaService<RegisterUseCaseParams>;
-  getUserByEmail: GetUserByEmailService;
+  isEmailAlreadyTaken: IsEmailAlreadyTakenService;
   hashPassword: HashPasswordService;
   addUser: AddUserService;
   logger: LoggerService;
@@ -27,7 +30,7 @@ type RegisterUseCase = (params: RegisterUseCaseParams) => Promise<void>;
 
 function registerUseCase({
   parseParamsSchema,
-  getUserByEmail,
+  isEmailAlreadyTaken,
   hashPassword,
   addUser,
   logger,
@@ -42,9 +45,9 @@ function registerUseCase({
 
     const { email, firstName, lastName, password } = data;
 
-    const existingUser = await getUserByEmail({ email });
+    const isTaken = await isEmailAlreadyTaken({ email });
 
-    if (existingUser != null) {
+    if (isTaken) {
       const badRequestError = new BadRequestError([
         { message: `Email is already registered: ${email}`, field: 'email' },
       ]);

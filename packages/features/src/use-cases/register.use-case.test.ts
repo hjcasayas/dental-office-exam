@@ -4,7 +4,7 @@ import {
   type RegisterUseCaseParams,
 } from './register.use-case.js';
 import { type AddUserService } from '../users/add-user.service.js';
-import { type GetUserByEmailService } from '../users/get-user-by-email.service.js';
+import { type IsEmailAlreadyTakenService } from '../users/is-email-already-taken.service.js';
 import {
   BadRequestError,
   ValidationError,
@@ -38,12 +38,12 @@ describe('Implementing dependencies correctly', () => {
       expect(lastName).toBe(lastNameTestParam);
     };
 
-    const fakeGetUserByEmailService: GetUserByEmailService = async ({
+    const fakeIsEmailAlreadyTakenService: IsEmailAlreadyTakenService = async ({
       email,
     }) => {
       getUserByEmailCallCount++;
       expect(email).toBe(emailTestParam);
-      return null;
+      return false;
     };
 
     const fakeHashPasswordService: HashPasswordService = async ({
@@ -83,7 +83,7 @@ describe('Implementing dependencies correctly', () => {
 
     const sut = registerUseCase({
       addUser: fakeAddUserService,
-      getUserByEmail: fakeGetUserByEmailService,
+      isEmailAlreadyTaken: fakeIsEmailAlreadyTakenService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
       logger: fakeLoggerService,
@@ -128,12 +128,12 @@ describe('Implementing dependencies correctly', () => {
       expect(lastName).toBe(lastNameTestParam);
     };
 
-    const fakeGetUserByEmailService: GetUserByEmailService = async ({
+    const fakeIsEmailAlreadyTakenService: IsEmailAlreadyTakenService = async ({
       email,
     }) => {
       getUserByEmailCallCount++;
       expect(email).toBe(emailTestParam);
-      return null;
+      return false;
     };
 
     const fakeHashPasswordService: HashPasswordService = async ({
@@ -173,7 +173,7 @@ describe('Implementing dependencies correctly', () => {
 
     const sut = registerUseCase({
       addUser: fakeAddUserService,
-      getUserByEmail: fakeGetUserByEmailService,
+      isEmailAlreadyTaken: fakeIsEmailAlreadyTakenService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
       logger: fakeLoggerService,
@@ -231,15 +231,11 @@ describe('Adding User', () => {
       expect(lastName).toBe(lastNameTestParam);
     };
 
-    const fakeGetUserByEmailService: GetUserByEmailService = async ({
+    const fakeIsEmailAlreadyTakenService: IsEmailAlreadyTakenService = async ({
       email,
     }) => {
       expect(email).toBe(emailTestParam);
-      return {
-        firstName: firstNameTestParam,
-        lastName: lastNameTestParam,
-        email: emailTestParam,
-      };
+      return true;
     };
 
     const fakeHashPasswordService: HashPasswordService = async ({
@@ -275,7 +271,7 @@ describe('Adding User', () => {
 
     const sut = registerUseCase({
       addUser: fakeAddUserService,
-      getUserByEmail: fakeGetUserByEmailService,
+      isEmailAlreadyTaken: fakeIsEmailAlreadyTakenService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
       logger: fakeLoggerService,
@@ -314,15 +310,11 @@ describe('Adding User', () => {
       expect(lastName).toBe(lastNameTestParam);
     };
 
-    const fakeGetUserByEmailService: GetUserByEmailService = async ({
+    const fakeIsEmailAlreadyTakenService: IsEmailAlreadyTakenService = async ({
       email,
     }) => {
       expect(email).toBe(emailTestParam);
-      return {
-        firstName: firstNameTestParam,
-        lastName: lastNameTestParam,
-        email: emailTestParam,
-      };
+      return false;
     };
 
     const fakeHashPasswordService: HashPasswordService = async ({
@@ -358,7 +350,7 @@ describe('Adding User', () => {
 
     const sut = registerUseCase({
       addUser: fakeAddUserService,
-      getUserByEmail: fakeGetUserByEmailService,
+      isEmailAlreadyTaken: fakeIsEmailAlreadyTakenService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
       logger: fakeLoggerService,
@@ -398,11 +390,11 @@ describe('Adding User', () => {
       expect(lastName).toBe(lastNameTestParam);
     };
 
-    const fakeGetUserByEmailService: GetUserByEmailService = async ({
+    const fakeIsEmailAlreadyTakenService: IsEmailAlreadyTakenService = async ({
       email,
     }) => {
       expect(email).toBe(emailTestParam);
-      return null;
+      return false;
     };
 
     const fakeHashPasswordService: HashPasswordService = async ({
@@ -440,7 +432,7 @@ describe('Adding User', () => {
 
     const sut = registerUseCase({
       addUser: fakeAddUserService,
-      getUserByEmail: fakeGetUserByEmailService,
+      isEmailAlreadyTaken: fakeIsEmailAlreadyTakenService,
       hashPassword: fakeHashPasswordService,
       parseParamsSchema: fakeParseRegisterUseCaseParams,
       logger: fakeLoggerService,

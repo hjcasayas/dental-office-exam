@@ -9,6 +9,6 @@ export function mongoAddUserService(): AddUserService {
   return async (
     params: AddUserServiceParams
   ): Promise<AddUserServiceResult> => {
-    await UserModel.create(params);
+    await UserModel.save(params);
   };
 }

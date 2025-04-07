@@ -1,13 +1,18 @@
 import type { UserEntity } from './user.entity.js';
 
-interface GetUserByEmailServiceParams {
-  email: string;
-}
+type GetUserByEmailServiceParams = Pick<UserEntity, 'email'>;
 
-type GetUserByEmailServiceResult = Omit<UserEntity, 'hashedPassword'> | null;
+type GetUserByEmailServiceResult = Omit<
+  UserEntity,
+  'hashedPassword' | 'createdDate' | 'updatedDate'
+> | null;
 
 type GetUserByEmailService = (
   params: GetUserByEmailServiceParams
 ) => Promise<GetUserByEmailServiceResult>;
 
-export { type GetUserByEmailService };
+export type {
+  GetUserByEmailService,
+  GetUserByEmailServiceParams,
+  GetUserByEmailServiceResult,
+};

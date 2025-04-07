@@ -1,9 +1,13 @@
+import { dirname } from 'node:path';
+import { createWriteStream, existsSync, WriteStream } from 'node:fs';
+import { mkdir } from 'node:fs/promises';
 import {
   createServer,
   IncomingMessage,
   Server,
   ServerResponse,
 } from 'node:http';
+
 import {
   environments,
   registerUseCase,
@@ -12,34 +16,29 @@ import {
   type LoggerService,
   type RegisterUseCase,
 } from '@dental/features';
+
 import {
   envConfigSchema,
   parseSchemaZodService,
 } from '@dental/implementations/zod';
-
 import {
   createWinstonLoggerService,
   getWinstonLoggerServiceOptions,
 } from '@dental/implementations/winston';
-
 import { server as expressServer } from '@dental/implementations/express';
-
 import { registerUseCaseParamsSchema } from '@dental/implementations/zod';
 import { bcryptHashPasswordService } from '@dental/implementations/bcrypt';
-
-import type { EnvConfig } from './config.type.js';
 import {
-  inMemoryGetUserByEmailService,
-  inMemoryDB,
-  inMemoryAddUserService,
-} from '@dental/implementations/in-memory';
+  createMongoConnection,
+  mongoAddUserService,
+  mongoGetUserByEmailService,
+} from '@dental/implementations/mongo';
+
 import {
   createMorganRequestLoggerService,
   getMorganLogsFormat,
 } from '@dental/implementations/morgan';
-import { dirname } from 'node:path';
-import { createWriteStream, existsSync, WriteStream } from 'node:fs';
-import { mkdir } from 'node:fs/promises';
+import type { EnvConfig } from './config.type.js';
 
 let server: Server<
   typeof IncomingMessage,
@@ -64,13 +63,13 @@ if (config == null) {
   throw error ?? new ValidationError();
 }
 
-const { nodeEnv, port } = config;
+const { nodeEnv, port, mongoConnectionString, mongoDB } = config;
 
 if (nodeEnv != null && nodeEnv === environments.dev) {
   console.table({
-    env: process.env.NODE_ENV,
-    connectionsString: process.env.MONGO_CONNECTION_STRING,
-    db: process.env.MONGO_DB,
+    env: nodeEnv,
+    connectionsString: mongoConnectionString,
+    db: mongoDB,
   });
 }
 
@@ -80,11 +79,13 @@ const winstonLoggerService: LoggerService = createWinstonLoggerService({
   options: getWinstonLoggerServiceOptions(environment),
 });
 
+await createMongoConnection(`${mongoConnectionString}/${mongoDB}`);
+
 const register: RegisterUseCase = registerUseCase({
   parseParamsSchema: parseSchemaZodService(registerUseCaseParamsSchema),
-  getUserByEmail: inMemoryGetUserByEmailService(inMemoryDB),
+  getUserByEmail: mongoGetUserByEmailService(),
   hashPassword: bcryptHashPasswordService(),
-  addUser: inMemoryAddUserService(inMemoryDB),
+  addUser: mongoAddUserService(),
   logger: winstonLoggerService,
 });
 
@@ -107,6 +108,7 @@ server = createServer(
         skip: (req, res) => res.statusCode < 400,
       },
     }),
+    logger: winstonLoggerService,
   })
 );
 

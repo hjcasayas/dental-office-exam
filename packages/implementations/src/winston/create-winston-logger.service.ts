@@ -1,5 +1,6 @@
-import type { LoggerService } from '@dental/features';
 import { createLogger, type LoggerOptions } from 'winston';
+
+import type { LoggerService } from '@dental/features';
 
 export function createWinstonLoggerService({
   options,

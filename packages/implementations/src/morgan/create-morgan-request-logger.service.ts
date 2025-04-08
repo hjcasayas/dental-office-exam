@@ -1,6 +1,8 @@
-import { type RequestLoggerService } from '@dental/features';
-import { IncomingMessage, type ServerResponse } from 'http';
+import { IncomingMessage, type ServerResponse } from 'node:http';
+
 import morgan, { type Options } from 'morgan';
+
+import { type RequestLoggerService } from '@dental/features';
 
 export const createMorganRequestLoggerService =
   ({

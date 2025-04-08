@@ -1,7 +1,8 @@
-import { type UserEntity } from '@dental/features';
 import { Document, Model, model, Schema } from 'mongoose';
-import { nameSchema } from '../../zod/shemas/name.schema.js';
-import { emailSchema } from '../../zod/shemas/email.schema.js';
+
+import { type UserEntity } from '@dental/features';
+import { emailSchema, nameSchema } from '@dental/implementations/zod';
+
 import { validator } from './validators/index.js';
 
 interface UserModelImpl extends Model<UserEntity> {

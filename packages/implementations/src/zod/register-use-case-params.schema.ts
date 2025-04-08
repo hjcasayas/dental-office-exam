@@ -1,8 +1,9 @@
+import validator from 'validator';
 import { z } from 'zod';
-import { nameSchema } from './shemas/name.schema.js';
+
 import { strongPasswordSchema } from './shemas/strong-password.schema.js';
 import { emailSchema } from './shemas/email.schema.js';
-import validator from 'validator';
+import { nameSchema } from './shemas/name.schema.js';
 
 export const registerUseCaseParamsSchema = z
   .object({

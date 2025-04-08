@@ -1,5 +1,6 @@
-import { environments, type Environment } from '@dental/features';
 import { format, transports, type LoggerOptions } from 'winston';
+
+import { environments, type Environment } from '@dental/features';
 
 export function getWinstonLoggerServiceOptions(
   environment: Environment

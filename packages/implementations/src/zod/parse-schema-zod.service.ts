@@ -1,5 +1,7 @@
-import { ValidationError, type ParseSchemaService } from '@dental/features';
 import { Schema } from 'zod';
+
+import { ValidationError, type ParseSchemaService } from '@dental/features';
+
 import { serializedZodError } from './serialized-zod-errors.js';
 
 export const parseSchemaZodService =

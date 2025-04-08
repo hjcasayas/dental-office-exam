@@ -1,6 +1,7 @@
-import { ValidationError } from '@dental/features';
 import { Schema } from 'zod';
-import { serializedZodError } from '../../../zod/index.js';
+
+import { serializedZodError } from '@dental/implementations/zod';
+import { ValidationError } from '@dental/features';
 
 export const validator =
   <TInput>(schema: Schema) =>

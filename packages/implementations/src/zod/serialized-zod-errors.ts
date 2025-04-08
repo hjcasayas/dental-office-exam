@@ -1,5 +1,6 @@
-import type { SerializedError } from '@dental/features';
 import type { ZodError } from 'zod';
+
+import type { SerializedError } from '@dental/features';
 
 export function serializedZodError(zodError: ZodError): SerializedError[] {
   const serializedErrors: SerializedError[] = [];

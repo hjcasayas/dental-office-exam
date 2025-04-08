@@ -1,4 +1,4 @@
-export * from './env/index.js';
+export * from './environments/index.js';
 export * from './errors/index.js';
 export * from './logger/index.js';
 export * from './password/index.js';

@@ -1,29 +1,19 @@
 import { z } from 'zod';
+import { nameSchema } from './shemas/name.schema.js';
+import { strongPasswordSchema } from './shemas/strong-password.schema.js';
+import { emailSchema } from './shemas/email.schema.js';
+import validator from 'validator';
 
 export const registerUseCaseParamsSchema = z
   .object({
-    firstName: z
-      .string()
-      .trim()
-      .refine((firstName) => {
-        return /\b([A-ZÀ-ÿ][-,a-z. ']+[ ]*)+/.test(firstName);
-      }, 'Invalid first name'),
-    lastName: z
-      .string()
-      .trim()
-      .refine((lastName) => {
-        return /\b([A-ZÀ-ÿ][-,a-z. ']+[ ]*)+/.test(lastName);
-      }, 'Invalid last name'),
-    password: z.string().refine((password) => {
-      return /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(
-        password
-      );
-    }, 'Password must have a minimum 8 characters in length, at least one uppercase English letter, at least one lowercase English letter, at least one digit and at least one special character'),
-    email: z.string().trim().toLowerCase().email(),
+    firstName: nameSchema(),
+    lastName: nameSchema(),
+    password: strongPasswordSchema(),
+    email: emailSchema(),
     confirmPassword: z.string(),
   })
   .superRefine((data, ctx) => {
-    if (data.password !== data.confirmPassword) {
+    if (!validator.equals(data.password, data.confirmPassword)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['confirmPassword'],

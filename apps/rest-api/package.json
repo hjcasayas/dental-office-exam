@@ -8,7 +8,7 @@
     "start:dev": "nodemon ./dist/src/index.js --watch dist",
     "clean": "tsc --build --clean",
     "build": "tsc --build --clean && tsc --build",
-    "start:": "node dist/src/index.js",
+    "start": "node dist/src/index.js",
     "prettier:write": "prettier src/**/* --write --ignore-unknown",
     "eslint:fix": "eslint src/**/*.{js,ts} --fix"
   },

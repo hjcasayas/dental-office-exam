@@ -15,6 +15,8 @@
     "clean:implementations": "npm run clean -w @dental/implementations --if-present",
     "build:implementations": "npm run build -w @dental/implementations --if-present",
     "test:features": "npm run test -w @dental/features --if-present",
+    "clean:all": "npm run clean --workspaces --if-present",
+    "build:all": "npm run build --workspaces --if-present",
     "prettier:write:all": "npm run prettier:write --workspaces --if-present",
     "eslint:fix:all": "npm run eslint:fix --workspaces --if-present",
     "git:commit": "npm run prettier:write:all && npm run eslint:fix:all && cz"

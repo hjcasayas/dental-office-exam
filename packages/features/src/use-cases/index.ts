@@ -1,1 +1,1 @@
-export * from './register.use-case.js';
+export * from './register/index.js';

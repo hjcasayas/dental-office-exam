@@ -3,15 +3,15 @@ import {
   registerUseCase,
   type RegisterUseCaseParams,
 } from './register.use-case.js';
-import { type AddUserService } from '../users/add-user.service.js';
-import { type IsEmailAlreadyTakenService } from '../users/is-email-already-taken.service.js';
+import { type AddUserService } from '../../users/add-user.service.js';
+import { type IsEmailAlreadyTakenService } from '../../users/is-email-already-taken.service.js';
 import {
   BadRequestError,
   ValidationError,
   type HashPasswordService,
   type LoggerService,
   type ParseSchemaService,
-} from '../utilities/index.js';
+} from '../../utilities/index.js';
 
 describe('Implementing dependencies correctly', () => {
   test('Calling the RegisterUseCase happy path once will call the dependencies once', async () => {

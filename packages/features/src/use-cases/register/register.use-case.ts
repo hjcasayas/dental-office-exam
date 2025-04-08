@@ -1,14 +1,14 @@
 import type {
   AddUserService,
   IsEmailAlreadyTakenService,
-} from '../users/index.js';
-import { ValidationError } from '../utilities/errors/validation.error.js';
+} from '../../users/index.js';
+import { ValidationError } from '../../utilities/errors/validation.error.js';
 import {
   BadRequestError,
   type HashPasswordService,
   type LoggerService,
   type ParseSchemaService,
-} from '../utilities/index.js';
+} from '../../utilities/index.js';
 
 interface RegisterUseCaseParams {
   confirmPassword: string;

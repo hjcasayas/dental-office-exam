@@ -1,6 +1,8 @@
+import type { StatusKey } from '../status-codes/index.js';
 import type { SerializedError } from './serialized-error.type.js';
 
 export abstract class CustomError extends Error {
+  abstract statusKey: StatusKey;
   abstract statusCode: number;
   constructor(message: string) {
     super(message);
@@ -8,21 +10,5 @@ export abstract class CustomError extends Error {
     Object.setPrototypeOf(this, CustomError.prototype);
   }
   abstract serializeErrors: () => SerializedError[];
-
-  toLogs = (): string => {
-    let error = this.message;
-
-    const serializedErrorsMessages = this.serializeErrors()
-      .filter((error) => error.message != this.message)
-      .map((error) => error.message);
-
-    if (
-      serializedErrorsMessages != null &&
-      serializedErrorsMessages.length > 0
-    ) {
-      error += `: ${serializedErrorsMessages.join(', ')}`;
-    }
-
-    return `${error}.`;
-  };
+  abstract toLogs: () => string;
 }

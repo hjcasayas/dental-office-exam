@@ -29,10 +29,7 @@ function errorhandler({
     _next: NextFunction
   ) => {
     if (error instanceof CustomError) {
-      const errorMessage = `${error.message}: ${error
-        .serializeErrors()
-        .map((error) => error.message)
-        .join(', ')}.`;
+      const errorMessage = error.message;
       res.locals.errorMessage = errorMessage;
       logger.log('error', error.toLogs());
 

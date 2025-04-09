@@ -1,32 +1,32 @@
-import { Document, Model, model, Schema } from 'mongoose';
+import { Document, Model, model, Schema, SchemaTypes } from 'mongoose';
 
 import { type UserEntity } from '@dental/features';
 import { emailSchema, nameSchema } from '@dental/implementations/zod';
 
 import { validator } from './validators/index.js';
 
-interface UserModelImpl extends Model<UserEntity> {
+type UserDoc = UserEntity & Document;
+
+interface UserModelImpl extends Model<UserDoc> {
   save: (user: UserEntity) => Promise<void>;
 }
-
-type UserDoc = UserEntity & Document;
 
 const userSchema = new Schema(
   {
     firstName: {
-      type: String,
+      type: SchemaTypes.String,
       required: true,
       trim: true,
       validate: validator<string>(nameSchema()),
     },
     lastName: {
-      type: String,
+      type: SchemaTypes.String,
       required: true,
       trim: true,
       validate: validator<string>(nameSchema()),
     },
     email: {
-      type: String,
+      type: SchemaTypes.String,
       required: true,
       lowercase: true,
       trim: true,
@@ -34,7 +34,7 @@ const userSchema = new Schema(
       validate: validator<string>(emailSchema()),
     },
     hashedPassword: {
-      type: String,
+      type: SchemaTypes.String,
       required: true,
     },
   },

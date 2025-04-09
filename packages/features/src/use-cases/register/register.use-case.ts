@@ -1,8 +1,8 @@
+import { log } from 'console';
 import type {
   AddUserService,
   IsEmailAlreadyTakenService,
 } from '../../users/index.js';
-import { ValidationError } from '../../utilities/errors/validation.error.js';
 import {
   BadRequestError,
   type HashPasswordService,
@@ -36,21 +36,24 @@ function registerUseCase({
   logger,
 }: RegisterUseCaseDependencies): RegisterUseCase {
   return async (params) => {
-    const { success, data, error } = parseParamsSchema(params);
+    const result = parseParamsSchema(params);
 
-    if (!success || data == null) {
-      const validationError = error ?? new ValidationError();
+    if (!result.success) {
+      const validationError = result.error;
+      logger.log('error', validationError.toLogs());
       throw validationError;
     }
 
-    const { email, firstName, lastName, password } = data;
+    const { email, firstName, lastName, password } = result.data;
 
     const isTaken = await isEmailAlreadyTaken({ email });
 
     if (isTaken) {
       const badRequestError = new BadRequestError([
-        { message: `Email is already registered: ${email}`, field: 'email' },
+        { message: `Email is already taken`, field: 'email' },
+        { message: email, forLogsOnly: true },
       ]);
+      log('error', badRequestError.toLogs());
       throw badRequestError;
     }
 

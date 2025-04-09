@@ -3,8 +3,8 @@ import {
   ReasonPhrases,
   StatusCodes,
   type LoggerService,
-  type SerializedError,
 } from '@dental/features';
+import type { ApiErrorResponse } from '@dental/features/src/common/api-responste.type.js';
 import type {
   ErrorRequestHandler,
   NextFunction,
@@ -20,23 +20,18 @@ function errorhandler({
   return (
     error: Error | CustomError,
     _req: Request,
-    res: Response<{
-      success: boolean;
-      message: string;
-      errors: SerializedError[];
-    }>,
+    res: Response<ApiErrorResponse>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _next: NextFunction
   ) => {
     if (error instanceof CustomError) {
       const errorMessage = error.message;
       res.locals.errorMessage = errorMessage;
-      logger.log('error', error.toLogs());
 
       res.status(error.statusCode).json({
         success: false,
         message: error.message,
-        errors: error.serializeErrors(),
+        errors: error.serializeErrors().filter((error) => !error.forLogsOnly),
       });
     } else {
       res.locals.errorMessage =

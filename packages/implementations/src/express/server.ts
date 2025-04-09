@@ -45,7 +45,7 @@ const server = ({
   app.post('/api/v1/register', registerUserHandler({ register }));
 
   // Login Routes
-  app.post('/api/vi/login', loginUserHandler({ login }));
+  app.post('/api/v1/login', loginUserHandler({ login }));
 
   // User Routes
   app.get('/api/v1/users', getAllUsersHandler());
@@ -53,7 +53,7 @@ const server = ({
   app.post('/api/v1/users', addUserHandler());
 
   app.use(() => {
-    throw new NotFoundError();
+    throw new NotFoundError([{ message: 'Route not supported' }]);
   });
 
   // Error Handler

@@ -5,4 +5,6 @@ export interface EnvConfig {
   nodeEnv?: string;
   mongoDB: string;
   port: number;
+  jwtAccessExpirationInMinutes: number;
+  jwtSecret: string;
 }

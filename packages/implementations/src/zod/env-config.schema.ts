@@ -7,6 +7,8 @@ export const envConfigSchema = z.object({
   mongoPassword: z.string(),
   mongoConnectionString: z.string(),
   mongoDB: z.string(),
+  jwtSecret: z.string(),
+  jwtAccessExpirationInMinutes: z.number(),
 });
 
 export type EnvConfigSchemaOutput = z.infer<typeof envConfigSchema>;

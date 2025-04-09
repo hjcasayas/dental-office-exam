@@ -3,6 +3,7 @@ import express, { type Response, type Request } from 'express';
 import {
   NotFoundError,
   type LoggerService,
+  type LoginUseCase,
   type RegisterUseCase,
   type RequestLoggerService,
 } from '@dental/features';
@@ -12,12 +13,14 @@ import { getUserByIdHandler } from './user/get-user-by-id.handler.js';
 import { getAllUsersHandler } from './user/get-all-users.handler.js';
 import { addUserHandler } from './user/add-user.handler.js';
 import { errorhandler } from './error/error.handler.js';
+import { loginUserHandler } from './user/login-user.handler.js';
 
 interface Dependencies {
   register: RegisterUseCase;
   successRequestLogger: RequestLoggerService;
   errorRequestLogger: RequestLoggerService;
   logger: LoggerService;
+  login: LoginUseCase;
 }
 
 const server = ({
@@ -25,6 +28,7 @@ const server = ({
   successRequestLogger,
   errorRequestLogger,
   logger,
+  login,
 }: Dependencies) => {
   const app = express();
 
@@ -37,13 +41,16 @@ const server = ({
     res.status(200).json({ message: 'express-app works' });
   });
 
+  // Register Routes
+  app.post('/api/v1/register', registerUserHandler({ register }));
+
+  // Login Routes
+  app.post('/api/vi/login', loginUserHandler({ login }));
+
   // User Routes
   app.get('/api/v1/users', getAllUsersHandler());
   app.get('/api/v1/users/:id', getUserByIdHandler());
   app.post('/api/v1/users', addUserHandler());
-
-  // Register Routes
-  app.post('/api/v1/register', registerUserHandler({ register }));
 
   app.use(() => {
     throw new NotFoundError();

@@ -6,7 +6,7 @@ export function createErrorMessage(
 ) {
   if (errors.length > 0) {
     return `${message}: ${errors
-      .filter((error) => !error.forLogs)
+      .filter((error) => !error.forLogsOnly)
       .map((error) => error.message)
       .join(', ')}.`;
   }

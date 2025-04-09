@@ -16,7 +16,7 @@ import {
 describe('Implementing dependencies correctly', () => {
   test('Calling the RegisterUseCase happy path once will call the dependencies once', async () => {
     let addUserCallCount = 0;
-    let getUserByEmailCallCount = 0;
+    let isEmailAlreadyTakenCallCount = 0;
     let hashPasswordCallCount = 0;
     let parseRegisterParamsCallCount = 0;
     let loggerCallCount = 0;
@@ -41,7 +41,7 @@ describe('Implementing dependencies correctly', () => {
     const fakeIsEmailAlreadyTakenService: IsEmailAlreadyTakenService = async ({
       email,
     }) => {
-      getUserByEmailCallCount++;
+      isEmailAlreadyTakenCallCount++;
       expect(email).toBe(emailTestParam);
       return false;
     };
@@ -98,7 +98,7 @@ describe('Implementing dependencies correctly', () => {
     });
 
     expect(addUserCallCount).toBe(1);
-    expect(getUserByEmailCallCount).toBe(1);
+    expect(isEmailAlreadyTakenCallCount).toBe(1);
     expect(hashPasswordCallCount).toBe(1);
     expect(parseRegisterParamsCallCount).toBe(1);
     expect(loggerCallCount).toBe(1);
@@ -106,7 +106,7 @@ describe('Implementing dependencies correctly', () => {
 
   test('Calling the RegisterUseCase happy path three times will call the dependencies three times', async () => {
     let addUserCallCount = 0;
-    let getUserByEmailCallCount = 0;
+    let isEmailAlreadyTakenCallCount = 0;
     let hashPasswordCallCount = 0;
     let parseRegisterParamsCallCount = 0;
     let loggerCallCount = 0;
@@ -131,7 +131,7 @@ describe('Implementing dependencies correctly', () => {
     const fakeIsEmailAlreadyTakenService: IsEmailAlreadyTakenService = async ({
       email,
     }) => {
-      getUserByEmailCallCount++;
+      isEmailAlreadyTakenCallCount++;
       expect(email).toBe(emailTestParam);
       return false;
     };
@@ -204,7 +204,7 @@ describe('Implementing dependencies correctly', () => {
     });
 
     expect(addUserCallCount).toBe(3);
-    expect(getUserByEmailCallCount).toBe(3);
+    expect(isEmailAlreadyTakenCallCount).toBe(3);
     expect(hashPasswordCallCount).toBe(3);
     expect(parseRegisterParamsCallCount).toBe(3);
     expect(loggerCallCount).toBe(3);
@@ -219,6 +219,10 @@ describe('Adding User', () => {
     const passwordTestParam = 'Password@123';
     const confirmPasswordTestParam = 'Password@123';
 
+    let addUserCallCount = 0;
+    let isEmailAlreadyTakenCallCount = 0;
+    let hashPasswordCallCount = 0;
+    let parseRegisterParamsCallCount = 0;
     let loggerCallCount = 0;
 
     const fakeAddUserService: AddUserService = async ({
@@ -226,6 +230,7 @@ describe('Adding User', () => {
       firstName,
       lastName,
     }) => {
+      addUserCallCount++;
       expect(email).toBe(emailTestParam);
       expect(firstName).toBe(firstNameTestParam);
       expect(lastName).toBe(lastNameTestParam);
@@ -234,6 +239,7 @@ describe('Adding User', () => {
     const fakeIsEmailAlreadyTakenService: IsEmailAlreadyTakenService = async ({
       email,
     }) => {
+      isEmailAlreadyTakenCallCount++;
       expect(email).toBe(emailTestParam);
       return true;
     };
@@ -241,6 +247,7 @@ describe('Adding User', () => {
     const fakeHashPasswordService: HashPasswordService = async ({
       password,
     }) => {
+      hashPasswordCallCount++;
       expect(password).toBe(passwordTestParam);
       return { hashedPassword: '' };
     };
@@ -248,6 +255,7 @@ describe('Adding User', () => {
     const fakeParseRegisterUseCaseParams: ParseSchemaService<
       RegisterUseCaseParams
     > = ({ firstName, lastName, email, password, confirmPassword }) => {
+      parseRegisterParamsCallCount++;
       expect(email).toBe(emailTestParam);
       expect(firstName).toBe(firstNameTestParam);
       expect(lastName).toBe(lastNameTestParam);
@@ -277,7 +285,7 @@ describe('Adding User', () => {
       logger: fakeLoggerService,
     });
 
-    await expect(() =>
+    await expect(
       sut({
         firstName: firstNameTestParam,
         lastName: lastNameTestParam,
@@ -285,11 +293,12 @@ describe('Adding User', () => {
         password: passwordTestParam,
         confirmPassword: confirmPasswordTestParam,
       })
-    )
-      .rejects.toThrow(BadRequestError)
-      .catch(() => {
-        expect(loggerCallCount).toBe(1);
-      });
+    ).rejects.toThrowError(BadRequestError);
+    expect(addUserCallCount).toBe(0);
+    expect(isEmailAlreadyTakenCallCount).toBe(1);
+    expect(hashPasswordCallCount).toBe(0);
+    expect(parseRegisterParamsCallCount).toBe(1);
+    expect(loggerCallCount).toBe(0);
   });
 
   test('Throw validation error when inputs are invalid', async () => {
@@ -298,6 +307,11 @@ describe('Adding User', () => {
     const emailTestParam = 'henlyjade.casayas@gmail.com';
     const passwordTestParam = 'Password@123';
     const confirmPasswordTestParam = 'Password@123';
+
+    let addUserCallCount = 0;
+    let isEmailAlreadyTakenCallCount = 0;
+    let hashPasswordCallCount = 0;
+    let parseRegisterParamsCallCount = 0;
     let loggerCallCount = 0;
 
     const fakeAddUserService: AddUserService = async ({
@@ -305,6 +319,7 @@ describe('Adding User', () => {
       firstName,
       lastName,
     }) => {
+      addUserCallCount++;
       expect(email).toBe(emailTestParam);
       expect(firstName).toBe(firstNameTestParam);
       expect(lastName).toBe(lastNameTestParam);
@@ -313,6 +328,7 @@ describe('Adding User', () => {
     const fakeIsEmailAlreadyTakenService: IsEmailAlreadyTakenService = async ({
       email,
     }) => {
+      isEmailAlreadyTakenCallCount++;
       expect(email).toBe(emailTestParam);
       return false;
     };
@@ -320,6 +336,7 @@ describe('Adding User', () => {
     const fakeHashPasswordService: HashPasswordService = async ({
       password,
     }) => {
+      hashPasswordCallCount++;
       expect(password).toBe(passwordTestParam);
       return { hashedPassword: '' };
     };
@@ -327,6 +344,7 @@ describe('Adding User', () => {
     const fakeParseRegisterUseCaseParams: ParseSchemaService<
       RegisterUseCaseParams
     > = ({ firstName, lastName, email, password, confirmPassword }) => {
+      parseRegisterParamsCallCount++;
       expect(email).toBe(emailTestParam);
       expect(firstName).toBe(firstNameTestParam);
       expect(lastName).toBe(lastNameTestParam);
@@ -356,7 +374,7 @@ describe('Adding User', () => {
       logger: fakeLoggerService,
     });
 
-    await expect(async () =>
+    await expect(
       sut({
         firstName: firstNameTestParam,
         lastName: lastNameTestParam,
@@ -364,14 +382,15 @@ describe('Adding User', () => {
         password: passwordTestParam,
         confirmPassword: confirmPasswordTestParam,
       })
-    )
-      .rejects.toThrow(ValidationError)
-      .catch(() => {
-        expect(loggerCallCount).toBe(1);
-      });
+    ).rejects.toThrowError(ValidationError);
+    expect(addUserCallCount).toBe(0);
+    expect(isEmailAlreadyTakenCallCount).toBe(0);
+    expect(hashPasswordCallCount).toBe(0);
+    expect(parseRegisterParamsCallCount).toBe(1);
+    expect(loggerCallCount).toBe(0);
   });
 
-  test('Adding user succeeds', async () => {
+  test('Successful registration', async () => {
     const firstNameTestParam = 'Henly Jade';
     const lastNameTestParam = 'Casayas';
     const emailTestParam = 'henlyjade.casayas@gmail.com';

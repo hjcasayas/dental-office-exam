@@ -1,4 +1,4 @@
-import type { ValidationError } from '../errors/index.js';
+import type { SerializedError } from '../errors/index.js';
 
 export interface ParseSchemaServiceSuccessResult<TData> {
   success: true;
@@ -6,7 +6,7 @@ export interface ParseSchemaServiceSuccessResult<TData> {
 }
 export interface ParseSchemaServiceErrorResult {
   success: false;
-  error: ValidationError;
+  errors: SerializedError[];
 }
 export type ParseSchemaServiceResult<TData> =
   | ParseSchemaServiceSuccessResult<TData>

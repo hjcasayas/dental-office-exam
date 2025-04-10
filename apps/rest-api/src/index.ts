@@ -10,10 +10,13 @@ import {
 
 import {
   environments,
+  loginUseCase,
+  NotFoundError,
   registerUseCase,
-  ValidationError,
+  tokens,
   type Environment,
   type LoggerService,
+  type LoginUseCase,
   type RegisterUseCase,
 } from '@dental/features';
 
@@ -27,12 +30,21 @@ import {
 } from '@dental/implementations/winston';
 import { server as expressServer } from '@dental/implementations/express';
 import { registerUseCaseParamsSchema } from '@dental/implementations/zod';
-import { bcryptHashPasswordService } from '@dental/implementations/bcrypt';
+import {
+  bcryptComparePasswordService,
+  bcryptHashPasswordService,
+} from '@dental/implementations/bcrypt';
 import {
   createMongoConnection,
   mongoAddUserService,
+  mongoGetUserByEmailService,
   mongoIsEmailAlreadyTakenService,
+  mongoSaveTokenService,
 } from '@dental/implementations/mongo';
+import {
+  createJwtPayload,
+  jwtGenerateAuthTokenService,
+} from '@dental/implementations/jwt';
 
 import {
   createMorganRequestLoggerService,
@@ -57,20 +69,24 @@ process.on(
 
 process.on('SIGTERM', sigtermHandler as NodeJS.SignalsListener);
 
-const { data: config, error } = getEnvConfig();
+const config = getEnvConfig();
 
-if (config == null) {
-  throw error ?? new ValidationError();
+if (!config.success) {
+  throw new NotFoundError(config.errors);
 }
 
-const { nodeEnv, port, mongoConnectionString, mongoDB } = config;
+const {
+  nodeEnv,
+  port,
+  mongoConnectionString,
+  mongoDB,
+  jwtSecret,
+  jwtAccessExpirationInMinutes,
+  jwtRefreshExpirationInDays,
+} = config.data;
 
 if (nodeEnv != null && nodeEnv === environments.dev) {
-  console.table({
-    env: nodeEnv,
-    connectionsString: mongoConnectionString,
-    db: mongoDB,
-  });
+  console.table(config);
 }
 
 const environment: Environment = nodeEnv as Environment;
@@ -87,6 +103,27 @@ const register: RegisterUseCase = registerUseCase({
   hashPassword: bcryptHashPasswordService(),
   addUser: mongoAddUserService(),
   logger: winstonLoggerService,
+});
+
+const login: LoginUseCase = loginUseCase({
+  generateAccessToken: jwtGenerateAuthTokenService(
+    jwtSecret,
+    createJwtPayload({
+      tokenExpirationInMinutes: jwtRefreshExpirationInDays * 24 * 60,
+      tokenType: tokens.refresh,
+    })
+  ),
+  generateRefreshToken: jwtGenerateAuthTokenService(
+    jwtSecret,
+    createJwtPayload({
+      tokenExpirationInMinutes: jwtAccessExpirationInMinutes,
+      tokenType: tokens.access,
+    })
+  ),
+  comparePassword: bcryptComparePasswordService(),
+  logger: winstonLoggerService,
+  getUserByEmail: mongoGetUserByEmailService(),
+  saveToken: mongoSaveTokenService(),
 });
 
 const accessLogStream = await createWritableStream('logs/access.log');
@@ -109,6 +146,7 @@ server = createServer(
       },
     }),
     logger: winstonLoggerService,
+    login,
   })
 );
 
@@ -126,6 +164,13 @@ function getEnvConfig() {
     mongoPassword: process.env.MONGO_PASSWORD!,
     mongoConnectionString: process.env.MONGO_CONNECTION_STRING!,
     mongoDB: process.env.MONGO_DB!,
+    jwtSecret: process.env.JWT_SECRET!,
+    jwtAccessExpirationInMinutes: Number(
+      process.env.JWT_ACCESS_EXPIRATION_IN_MINUTES!
+    ),
+    jwtRefreshExpirationInDays: Number(
+      process.env.JWT_REFRESH_EXPIRATION_IN_DAYS!
+    ),
   });
 }
 

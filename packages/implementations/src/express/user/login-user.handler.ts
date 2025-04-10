@@ -9,8 +9,8 @@ const loginUserHandler =
     res: Response<ApiSuccessResponse<LoginUseCaseResult>>
   ) => {
     const { email, password } = req.body;
-    const data = await login({ email, password });
-    res.status(201).json({ success: true, message: 'Sussessful login.', data });
+    const response = await login({ email, password });
+    res.status(201).json(response);
   };
 
 export { loginUserHandler };

@@ -6,10 +6,14 @@ const registerUserHandler =
   ({ register }: { register: RegisterUseCase }): RequestHandler =>
   async (req: Request, res: Response<ApiSuccessResponse>) => {
     const { firstName, lastName, email, password, confirmPassword } = req.body;
-    await register({ firstName, lastName, email, password, confirmPassword });
-    res
-      .status(201)
-      .json({ success: true, message: 'Successfully registration.' });
+    const response = await register({
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword,
+    });
+    res.status(201).json(response);
   };
 
 export { registerUserHandler };

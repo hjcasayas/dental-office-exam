@@ -1,4 +1,4 @@
-import { log } from 'console';
+import type { ApiSuccessResponse } from '../../common/api-responste.type.js';
 import type {
   AddUserService,
   IsEmailAlreadyTakenService,
@@ -26,7 +26,9 @@ interface RegisterUseCaseDependencies {
   logger: LoggerService;
 }
 
-type RegisterUseCase = (params: RegisterUseCaseParams) => Promise<void>;
+type RegisterUseCase = (
+  params: RegisterUseCaseParams
+) => Promise<ApiSuccessResponse>;
 
 function registerUseCase({
   parseParamsSchema,
@@ -39,7 +41,7 @@ function registerUseCase({
     const result = parseParamsSchema(params);
 
     if (!result.success) {
-      const validationError = result.error;
+      const validationError = new BadRequestError(result.errors);
       logger.log('error', validationError.toLogs());
       throw validationError;
     }
@@ -53,15 +55,15 @@ function registerUseCase({
         { message: `Email is already taken`, field: 'email' },
         { message: email, forLogsOnly: true },
       ]);
-      log('error', badRequestError.toLogs());
+      logger.log('error', badRequestError.toLogs());
       throw badRequestError;
     }
 
     const { hashedPassword } = await hashPassword({ password });
 
     await addUser({ firstName, lastName, email, hashedPassword });
-    logger.log('info', `Successfully registered user with email: ${email}.`);
-    return;
+    logger.log('info', `Successful registration: ${email}.`);
+    return { success: true, message: 'Successful registration' };
   };
 }
 

@@ -1,10 +1,10 @@
 import { tokens, type TokenEntity } from '@dental/features';
 import { Document, model, Model, Schema, SchemaTypes } from 'mongoose';
 
-type TokenDoc = TokenEntity & Document;
+export type TokenDoc = TokenEntity & Document;
 
 interface TokenModelImpl extends Model<TokenDoc> {
-  save: (token: TokenEntity) => Promise<void>;
+  save: (token: TokenEntity) => Promise<TokenDoc>;
 }
 
 const tokenSchema = new Schema({
@@ -32,6 +32,12 @@ const tokenSchema = new Schema({
     required: false,
   },
 });
+
+tokenSchema.statics.save = async (
+  tokenEntity: TokenEntity
+): Promise<TokenDoc> => {
+  return await TokenModel.create(tokenEntity);
+};
 
 const TokenModel = model<TokenDoc, TokenModelImpl>('Token', tokenSchema);
 

@@ -1,9 +1,10 @@
 import type { Token } from './tokens.js';
 
 export interface TokenEntity {
-  token: string;
+  issuedAt: number;
   userId: string;
-  type: Token;
   expires: Date;
+  token: string;
+  type: Token;
   blacklisted?: boolean;
 }

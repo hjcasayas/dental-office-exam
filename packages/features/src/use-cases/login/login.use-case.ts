@@ -85,10 +85,10 @@ function loginUseCase({
 
     await saveToken(refreshTokenEntity);
 
-    logger.log('info', `Successful login: ${email}`);
+    logger.log('info', `Successful login: ${email}.`);
     return {
       success: true,
-      message: 'Successful login',
+      message: 'Successful login.',
       data: {
         accessToken: accessTokenEntity,
         refreshToken: refreshTokenEntity,

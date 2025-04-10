@@ -14,7 +14,8 @@ import { loginUseCase } from './login.use-case.js';
 describe('Implementing LoginUsecase dependencies correctly.', () => {
   test('Calling the RegisterUseCase happy path once will call the dependencies once.', async () => {
     let getUserByEmailCallCount = 0;
-    let generateAuthTokenCallCount = 0;
+    let generateRefreshTokenCallCount = 0;
+    let generateAccessTokenCallCount = 0;
     let loggerCallCount = 0;
     let comparePasswordCallCount = 0;
     let saveTokenCallCount = 0;
@@ -23,14 +24,20 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
     const hashPasswordTestParam = 'Password@123';
     const passwordTestParam = 'Password@123';
     const userIdTestParam = 'testId';
-    const tokenEntityTestParam: TokenEntity = {
+    const accessTokenEntityTestParam: TokenEntity = {
       token: 'tokenTestParam',
       issuedAt: Date.now(),
       expires: new Date(),
       userId: userIdTestParam,
       type: tokens.access,
     };
-
+    const refreshTokenEntityTestParam: TokenEntity = {
+      token: 'tokenTestParam',
+      issuedAt: Date.now(),
+      expires: new Date(),
+      userId: userIdTestParam,
+      type: tokens.refresh,
+    };
     const fakeGetUserByEmailService: GetUserByEmailService = async ({
       email,
     }) => {
@@ -44,19 +51,28 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
         email,
       };
     };
-    const fakeGenerateAuthTokenService: GenerateAuthTokenService = ({
+
+    const fakeGenerateRefreshTokenService: GenerateAuthTokenService = ({
       userId,
     }) => {
-      generateAuthTokenCallCount++;
+      generateRefreshTokenCallCount++;
       expect(userId).toBe(userIdTestParam);
-      return tokenEntityTestParam;
+      return refreshTokenEntityTestParam;
+    };
+
+    const fakeGenerateAccessTokenService: GenerateAuthTokenService = ({
+      userId,
+    }) => {
+      generateAccessTokenCallCount++;
+      expect(userId).toBe(userIdTestParam);
+      return accessTokenEntityTestParam;
     };
 
     const fakeLoggerService: LoggerService = {
       log: (level, message) => {
         loggerCallCount++;
         expect(level).toBe('info');
-        expect(message).toBe(`Successful login: ${emailTestParam}`);
+        expect(message).toBe(`Successful login: ${emailTestParam}.`);
       },
     };
 
@@ -74,13 +90,13 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
       tokenEntity: TokenEntity
     ) => {
       saveTokenCallCount++;
-      expect(tokenEntity).toBe(tokenEntityTestParam);
+      expect(tokenEntity).toBe(refreshTokenEntityTestParam);
       return tokenEntity;
     };
 
     const sut = loginUseCase({
-      generateRefreshToken: fakeGenerateAuthTokenService,
-      generateAccessToken: fakeGenerateAuthTokenService,
+      generateRefreshToken: fakeGenerateRefreshTokenService,
+      generateAccessToken: fakeGenerateAccessTokenService,
       comparePassword: fakeComparePasswordService,
       getUserByEmail: fakeGetUserByEmailService,
       saveToken: fakeSaveTokenService,
@@ -91,14 +107,16 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
       password: passwordTestParam,
     });
     expect(getUserByEmailCallCount).toBe(1);
-    expect(generateAuthTokenCallCount).toBe(2);
+    expect(generateAccessTokenCallCount).toBe(1);
+    expect(generateRefreshTokenCallCount).toBe(1);
     expect(loggerCallCount).toBe(1);
     expect(comparePasswordCallCount).toBe(1);
     expect(saveTokenCallCount).toBe(1);
   });
   test('Calling the RegisterUseCase happy path three times will call the dependencies three times.', async () => {
     let getUserByEmailCallCount = 0;
-    let generateAuthTokenCallCount = 0;
+    let generateRefreshTokenCallCount = 0;
+    let generateAccessTokenCallCount = 0;
     let loggerCallCount = 0;
     let comparePasswordCallCount = 0;
     let saveTokenCallCount = 0;
@@ -107,12 +125,20 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
     const hashPasswordTestParam = 'Password@123';
     const passwordTestParam = 'Password@123';
     const userIdTestParam = 'testId';
-    const tokenEntityTestParam: TokenEntity = {
+    const accessTokenEntityTestParam: TokenEntity = {
       token: 'tokenTestParam',
       issuedAt: Date.now(),
       expires: new Date(),
       userId: userIdTestParam,
       type: tokens.access,
+    };
+
+    const refreshTokenEntityTestParam: TokenEntity = {
+      token: 'tokenTestParam',
+      issuedAt: Date.now(),
+      expires: new Date(),
+      userId: userIdTestParam,
+      type: tokens.refresh,
     };
 
     const fakeGetUserByEmailService: GetUserByEmailService = async ({
@@ -129,19 +155,27 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
       };
     };
 
-    const fakeGenerateAuthTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateRefreshTokenService: GenerateAuthTokenService = ({
       userId,
     }) => {
-      generateAuthTokenCallCount++;
+      generateRefreshTokenCallCount++;
       expect(userId).toBe(userIdTestParam);
-      return tokenEntityTestParam;
+      return refreshTokenEntityTestParam;
+    };
+
+    const fakeGenerateAccessTokenService: GenerateAuthTokenService = ({
+      userId,
+    }) => {
+      generateAccessTokenCallCount++;
+      expect(userId).toBe(userIdTestParam);
+      return accessTokenEntityTestParam;
     };
 
     const fakeLoggerService: LoggerService = {
       log: (level, message) => {
         loggerCallCount++;
         expect(level).toBe('info');
-        expect(message).toBe(`Successful login: ${emailTestParam}`);
+        expect(message).toBe(`Successful login: ${emailTestParam}.`);
       },
     };
 
@@ -149,7 +183,7 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
       tokenEntity: TokenEntity
     ) => {
       saveTokenCallCount++;
-      expect(tokenEntity).toBe(tokenEntityTestParam);
+      expect(tokenEntity).toBe(refreshTokenEntityTestParam);
       return tokenEntity;
     };
 
@@ -165,8 +199,8 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
 
     const sut = loginUseCase({
       getUserByEmail: fakeGetUserByEmailService,
-      generateAccessToken: fakeGenerateAuthTokenService,
-      generateRefreshToken: fakeGenerateAuthTokenService,
+      generateAccessToken: fakeGenerateAccessTokenService,
+      generateRefreshToken: fakeGenerateRefreshTokenService,
       comparePassword: fakeComparePasswordService,
       saveToken: fakeSaveTokenService,
       logger: fakeLoggerService,
@@ -186,7 +220,8 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
     });
 
     expect(getUserByEmailCallCount).toBe(3);
-    expect(generateAuthTokenCallCount).toBe(6);
+    expect(generateAccessTokenCallCount).toBe(3);
+    expect(generateRefreshTokenCallCount).toBe(3);
     expect(comparePasswordCallCount).toBe(3);
     expect(loggerCallCount).toBe(3);
     expect(saveTokenCallCount).toBe(3);
@@ -196,7 +231,8 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
 describe('Login paths.', () => {
   test('Unregistered email will throw Bad Request Error.', async () => {
     let getUserByEmailCallCount = 0;
-    let generateAuthTokenCallCount = 0;
+    let generateRefreshTokenCallCount = 0;
+    let generateAccessTokenCallCount = 0;
     let loggerCallCount = 0;
     let comparePasswordCallCount = 0;
     let saveTokenCallCount = 0;
@@ -205,12 +241,19 @@ describe('Login paths.', () => {
     const hashPasswordTestParam = 'Password@123';
     const passwordTestParam = 'Password@123';
     const userIdTestParam = 'testId';
-    const tokenEntityTestParam: TokenEntity = {
+    const accessTokenEntityTestParam: TokenEntity = {
       token: 'tokenTestParam',
       issuedAt: Date.now(),
       expires: new Date(),
       userId: userIdTestParam,
       type: tokens.access,
+    };
+    const refreshTokenEntityTestParam: TokenEntity = {
+      token: 'tokenTestParam',
+      issuedAt: Date.now(),
+      expires: new Date(),
+      userId: userIdTestParam,
+      type: tokens.refresh,
     };
 
     const fakeGetUserByEmailService: GetUserByEmailService = async ({
@@ -221,18 +264,20 @@ describe('Login paths.', () => {
       return null;
     };
 
-    const fakeGenerateAuthTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateRefreshTokenService: GenerateAuthTokenService = ({
       userId,
     }) => {
-      generateAuthTokenCallCount++;
+      generateRefreshTokenCallCount++;
       expect(userId).toBe(userIdTestParam);
-      return {
-        token: '',
-        issuedAt: Date.now(),
-        expires: new Date(),
-        userId,
-        type: tokens.access,
-      };
+      return refreshTokenEntityTestParam;
+    };
+
+    const fakeGenerateAccessTokenService: GenerateAuthTokenService = ({
+      userId,
+    }) => {
+      generateAccessTokenCallCount++;
+      expect(userId).toBe(userIdTestParam);
+      return accessTokenEntityTestParam;
     };
 
     const fakeLoggerService: LoggerService = {
@@ -257,14 +302,14 @@ describe('Login paths.', () => {
       tokenEntity: TokenEntity
     ) => {
       saveTokenCallCount++;
-      expect(tokenEntity).toBe(tokenEntityTestParam);
+      expect(tokenEntity).toBe(refreshTokenEntityTestParam);
       return tokenEntity;
     };
 
     const sut = loginUseCase({
       getUserByEmail: fakeGetUserByEmailService,
-      generateAccessToken: fakeGenerateAuthTokenService,
-      generateRefreshToken: fakeGenerateAuthTokenService,
+      generateAccessToken: fakeGenerateAccessTokenService,
+      generateRefreshToken: fakeGenerateRefreshTokenService,
       comparePassword: fakeComparePasswordService,
       saveToken: fakeSaveTokenService,
       logger: fakeLoggerService,
@@ -275,13 +320,15 @@ describe('Login paths.', () => {
     ).rejects.toThrowError('Email and/or password is incorrect');
     expect(getUserByEmailCallCount).toBe(1);
     expect(loggerCallCount).toBe(1);
-    expect(generateAuthTokenCallCount).toBe(0);
+    expect(generateAccessTokenCallCount).toBe(0);
+    expect(generateRefreshTokenCallCount).toBe(0);
     expect(comparePasswordCallCount).toBe(0);
     expect(saveTokenCallCount).toBe(0);
   });
   test('Wrong  password will throw Bad Request Error.', async () => {
     let getUserByEmailCallCount = 0;
-    let generateAuthTokenCallCount = 0;
+    let generateRefreshTokenCallCount = 0;
+    let generateAccessTokenCallCount = 0;
     let loggerCallCount = 0;
     let comparePasswordCallCount = 0;
     let saveTokenCallCount = 0;
@@ -290,12 +337,19 @@ describe('Login paths.', () => {
     const hashPasswordTestParam = 'Password@123';
     const passwordTestParam = 'Password@123';
     const userIdTestParam = 'testId';
-    const tokenEntityTestParam: TokenEntity = {
+    const accessTokenEntityTestParam: TokenEntity = {
       token: 'tokenTestParam',
       issuedAt: Date.now(),
       expires: new Date(),
       userId: userIdTestParam,
       type: tokens.access,
+    };
+    const refreshTokenEntityTestParam: TokenEntity = {
+      token: 'tokenTestParam',
+      issuedAt: Date.now(),
+      expires: new Date(),
+      userId: userIdTestParam,
+      type: tokens.refresh,
     };
 
     const fakeGetUserByEmailService: GetUserByEmailService = async ({
@@ -306,18 +360,20 @@ describe('Login paths.', () => {
       return null;
     };
 
-    const fakeGenerateAuthTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateRefreshTokenService: GenerateAuthTokenService = ({
       userId,
     }) => {
-      generateAuthTokenCallCount++;
+      generateRefreshTokenCallCount++;
       expect(userId).toBe(userIdTestParam);
-      return {
-        token: '',
-        issuedAt: Date.now(),
-        expires: new Date(),
-        userId,
-        type: tokens.access,
-      };
+      return refreshTokenEntityTestParam;
+    };
+
+    const fakeGenerateAccessTokenService: GenerateAuthTokenService = ({
+      userId,
+    }) => {
+      generateAccessTokenCallCount++;
+      expect(userId).toBe(userIdTestParam);
+      return accessTokenEntityTestParam;
     };
 
     const fakeLoggerService: LoggerService = {
@@ -342,14 +398,14 @@ describe('Login paths.', () => {
       tokenEntity: TokenEntity
     ) => {
       saveTokenCallCount++;
-      expect(tokenEntity).toBe(tokenEntityTestParam);
+      expect(tokenEntity).toBe(refreshTokenEntityTestParam);
       return tokenEntity;
     };
 
     const sut = loginUseCase({
       getUserByEmail: fakeGetUserByEmailService,
-      generateAccessToken: fakeGenerateAuthTokenService,
-      generateRefreshToken: fakeGenerateAuthTokenService,
+      generateAccessToken: fakeGenerateAccessTokenService,
+      generateRefreshToken: fakeGenerateRefreshTokenService,
       comparePassword: fakeComparePasswordService,
       saveToken: fakeSaveTokenService,
       logger: fakeLoggerService,
@@ -360,13 +416,15 @@ describe('Login paths.', () => {
     ).rejects.toThrowError('Email and/or password is incorrect');
     expect(getUserByEmailCallCount).toBe(1);
     expect(loggerCallCount).toBe(1);
-    expect(generateAuthTokenCallCount).toBe(0);
+    expect(generateAccessTokenCallCount).toBe(0);
+    expect(generateRefreshTokenCallCount).toBe(0);
     expect(comparePasswordCallCount).toBe(0);
     expect(saveTokenCallCount).toBe(0);
   });
   test('Login succeeds.', async () => {
     let getUserByEmailCallCount = 0;
-    let generateAuthTokenCallCount = 0;
+    let generateRefreshTokenCallCount = 0;
+    let generateAccessTokenCallCount = 0;
     let loggerCallCount = 0;
     let comparePasswordCallCount = 0;
     let saveTokenCallCount = 0;
@@ -375,12 +433,19 @@ describe('Login paths.', () => {
     const hashPasswordTestParam = 'Password@123';
     const passwordTestParam = 'Password@123';
     const userIdTestParam = 'testId';
-    const tokenEntityTestParam: TokenEntity = {
+    const accessTokenEntityTestParam: TokenEntity = {
       token: 'tokenTestParam',
       issuedAt: Date.now(),
       expires: new Date(),
       userId: userIdTestParam,
       type: tokens.access,
+    };
+    const refreshTokenEntityTestParam: TokenEntity = {
+      token: 'tokenTestParam',
+      issuedAt: Date.now(),
+      expires: new Date(),
+      userId: userIdTestParam,
+      type: tokens.refresh,
     };
 
     const fakeGetUserByEmailService: GetUserByEmailService = async ({
@@ -398,19 +463,27 @@ describe('Login paths.', () => {
       };
     };
 
-    const fakeGenerateAuthTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateRefreshTokenService: GenerateAuthTokenService = ({
       userId,
     }) => {
-      generateAuthTokenCallCount++;
+      generateRefreshTokenCallCount++;
       expect(userId).toBe(userIdTestParam);
-      return tokenEntityTestParam;
+      return refreshTokenEntityTestParam;
+    };
+
+    const fakeGenerateAccessTokenService: GenerateAuthTokenService = ({
+      userId,
+    }) => {
+      generateAccessTokenCallCount++;
+      expect(userId).toBe(userIdTestParam);
+      return accessTokenEntityTestParam;
     };
 
     const fakeLoggerService: LoggerService = {
       log: (level, message) => {
         loggerCallCount++;
         expect(level).toBe('info');
-        expect(message).toBe(`Successful login: ${emailTestParam}`);
+        expect(message).toBe(`Successful login: ${emailTestParam}.`);
       },
     };
 
@@ -428,14 +501,14 @@ describe('Login paths.', () => {
       tokenEntity: TokenEntity
     ) => {
       saveTokenCallCount++;
-      expect(tokenEntity).toBe(tokenEntityTestParam);
+      expect(tokenEntity).toBe(refreshTokenEntityTestParam);
       return tokenEntity;
     };
 
     const sut = loginUseCase({
       getUserByEmail: fakeGetUserByEmailService,
-      generateAccessToken: fakeGenerateAuthTokenService,
-      generateRefreshToken: fakeGenerateAuthTokenService,
+      generateAccessToken: fakeGenerateAccessTokenService,
+      generateRefreshToken: fakeGenerateRefreshTokenService,
       comparePassword: fakeComparePasswordService,
       saveToken: fakeSaveTokenService,
       logger: fakeLoggerService,
@@ -447,7 +520,8 @@ describe('Login paths.', () => {
     });
     expect(sutSpy).toHaveResolved();
     expect(getUserByEmailCallCount).toBe(1);
-    expect(generateAuthTokenCallCount).toBe(2);
+    expect(generateAccessTokenCallCount).toBe(1);
+    expect(generateRefreshTokenCallCount).toBe(1);
     expect(comparePasswordCallCount).toBe(1);
     expect(loggerCallCount).toBe(1);
     expect(saveTokenCallCount).toBe(1);

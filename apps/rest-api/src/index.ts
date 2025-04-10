@@ -106,14 +106,14 @@ const register: RegisterUseCase = registerUseCase({
 });
 
 const login: LoginUseCase = loginUseCase({
-  generateAccessToken: jwtGenerateAuthTokenService(
+  generateRefreshToken: jwtGenerateAuthTokenService(
     jwtSecret,
     createJwtPayload({
       tokenExpirationInMinutes: jwtRefreshExpirationInDays * 24 * 60,
       tokenType: tokens.refresh,
     })
   ),
-  generateRefreshToken: jwtGenerateAuthTokenService(
+  generateAccessToken: jwtGenerateAuthTokenService(
     jwtSecret,
     createJwtPayload({
       tokenExpirationInMinutes: jwtAccessExpirationInMinutes,

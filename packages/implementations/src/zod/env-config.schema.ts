@@ -9,6 +9,7 @@ export const envConfigSchema = z.object({
   mongoDB: z.string(),
   jwtSecret: z.string(),
   jwtAccessExpirationInMinutes: z.number(),
+  jwtRefreshExpirationInDays: z.number(),
 });
 
 export type EnvConfigSchemaOutput = z.infer<typeof envConfigSchema>;

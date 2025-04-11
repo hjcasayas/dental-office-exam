@@ -43,7 +43,7 @@ import {
 } from '@dental/implementations/mongo';
 import {
   createJwtPayload,
-  jwtGenerateAuthTokenService,
+  jwtGenerateTokenService,
 } from '@dental/implementations/jwt';
 
 import {
@@ -106,14 +106,14 @@ const register: RegisterUseCase = registerUseCase({
 });
 
 const login: LoginUseCase = loginUseCase({
-  generateRefreshToken: jwtGenerateAuthTokenService(
+  generateRefreshToken: jwtGenerateTokenService(
     jwtSecret,
     createJwtPayload({
       tokenExpirationInMinutes: jwtRefreshExpirationInDays * 24 * 60,
       tokenType: tokens.refresh,
     })
   ),
-  generateAccessToken: jwtGenerateAuthTokenService(
+  generateAccessToken: jwtGenerateTokenService(
     jwtSecret,
     createJwtPayload({
       tokenExpirationInMinutes: jwtAccessExpirationInMinutes,

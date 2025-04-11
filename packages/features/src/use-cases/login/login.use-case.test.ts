@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from 'vitest';
 import {
   tokens,
   type ComparePasswordService,
-  type GenerateAuthTokenService,
+  type GenerateTokenService,
   type GetUserByEmailService,
   type LoggerService,
   type SaveTokenService,
@@ -12,7 +12,7 @@ import {
 import { loginUseCase } from './login.use-case.js';
 
 describe('Implementing LoginUsecase dependencies correctly.', () => {
-  test('Calling the RegisterUseCase happy path once will call the dependencies once.', async () => {
+  test('Calling the LoginUsecase happy path once will call the dependencies once.', async () => {
     let getUserByEmailCallCount = 0;
     let generateRefreshTokenCallCount = 0;
     let generateAccessTokenCallCount = 0;
@@ -52,7 +52,7 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
       };
     };
 
-    const fakeGenerateRefreshTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateRefreshTokenService: GenerateTokenService = ({
       userId,
     }) => {
       generateRefreshTokenCallCount++;
@@ -60,7 +60,7 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
       return refreshTokenEntityTestParam;
     };
 
-    const fakeGenerateAccessTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateAccessTokenService: GenerateTokenService = ({
       userId,
     }) => {
       generateAccessTokenCallCount++;
@@ -113,7 +113,7 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
     expect(comparePasswordCallCount).toBe(1);
     expect(saveTokenCallCount).toBe(1);
   });
-  test('Calling the RegisterUseCase happy path three times will call the dependencies three times.', async () => {
+  test('Calling the LoginUsecase happy path three times will call the dependencies three times.', async () => {
     let getUserByEmailCallCount = 0;
     let generateRefreshTokenCallCount = 0;
     let generateAccessTokenCallCount = 0;
@@ -155,7 +155,7 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
       };
     };
 
-    const fakeGenerateRefreshTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateRefreshTokenService: GenerateTokenService = ({
       userId,
     }) => {
       generateRefreshTokenCallCount++;
@@ -163,7 +163,7 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
       return refreshTokenEntityTestParam;
     };
 
-    const fakeGenerateAccessTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateAccessTokenService: GenerateTokenService = ({
       userId,
     }) => {
       generateAccessTokenCallCount++;
@@ -264,7 +264,7 @@ describe('Login paths.', () => {
       return null;
     };
 
-    const fakeGenerateRefreshTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateRefreshTokenService: GenerateTokenService = ({
       userId,
     }) => {
       generateRefreshTokenCallCount++;
@@ -272,7 +272,7 @@ describe('Login paths.', () => {
       return refreshTokenEntityTestParam;
     };
 
-    const fakeGenerateAccessTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateAccessTokenService: GenerateTokenService = ({
       userId,
     }) => {
       generateAccessTokenCallCount++;
@@ -360,7 +360,7 @@ describe('Login paths.', () => {
       return null;
     };
 
-    const fakeGenerateRefreshTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateRefreshTokenService: GenerateTokenService = ({
       userId,
     }) => {
       generateRefreshTokenCallCount++;
@@ -368,7 +368,7 @@ describe('Login paths.', () => {
       return refreshTokenEntityTestParam;
     };
 
-    const fakeGenerateAccessTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateAccessTokenService: GenerateTokenService = ({
       userId,
     }) => {
       generateAccessTokenCallCount++;
@@ -463,7 +463,7 @@ describe('Login paths.', () => {
       };
     };
 
-    const fakeGenerateRefreshTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateRefreshTokenService: GenerateTokenService = ({
       userId,
     }) => {
       generateRefreshTokenCallCount++;
@@ -471,7 +471,7 @@ describe('Login paths.', () => {
       return refreshTokenEntityTestParam;
     };
 
-    const fakeGenerateAccessTokenService: GenerateAuthTokenService = ({
+    const fakeGenerateAccessTokenService: GenerateTokenService = ({
       userId,
     }) => {
       generateAccessTokenCallCount++;

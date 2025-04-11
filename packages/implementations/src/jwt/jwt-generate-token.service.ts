@@ -1,11 +1,11 @@
-import { type GenerateAuthTokenService } from '@dental/features';
+import { type GenerateTokenService } from '@dental/features';
 import jwt from 'jsonwebtoken';
 import type { JwtPayload } from './create-jwt-payloads.js';
 
-export function jwtGenerateAuthTokenService(
+export function jwtGenerateTokenService(
   secret: string,
   { issuedAt, expires, blacklisted = false, type }: JwtPayload
-): GenerateAuthTokenService {
+): GenerateTokenService {
   return ({ userId }) => {
     const token = jwt.sign({ userId, issuedAt, blacklisted, type }, secret, {
       expiresIn: expires.getTime(),

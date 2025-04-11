@@ -1,5 +1,5 @@
 import type { GetUserByEmailService } from '../../users/get-user-by-email.service.js';
-import type { GenerateAuthTokenService } from '../../tokens/generate-auth-token.service.js';
+import type { GenerateTokenService } from '../../tokens/generate-token.service.js';
 import {
   BadRequestError,
   type ComparePasswordService,
@@ -20,8 +20,8 @@ interface LoginUseCaseResult {
 }
 
 interface LoginUseCaseDependencies {
-  generateRefreshToken: GenerateAuthTokenService;
-  generateAccessToken: GenerateAuthTokenService;
+  generateRefreshToken: GenerateTokenService;
+  generateAccessToken: GenerateTokenService;
   comparePassword: ComparePasswordService;
   getUserByEmail: GetUserByEmailService;
   saveToken: SaveTokenService;

@@ -45,16 +45,16 @@ function loginUseCase({
     const user = await getUserByEmail({ email });
 
     if (user == null) {
-      const badRequestError = new BadRequestError([
-        {
-          message: `User does not exist: ${email}`,
-          field: 'email',
-          forLogsOnly: true,
-        },
-        { message: 'Email and/or password is incorrect' },
-      ]);
-      logger.log('error', badRequestError.toLogs());
-      throw badRequestError;
+      throw logger.logAndReturnError(
+        new BadRequestError([
+          {
+            message: `User does not exist: ${email}`,
+            field: 'email',
+            forLogsOnly: true,
+          },
+          { message: 'Email and/or password is incorrect' },
+        ])
+      );
     }
 
     const passwordIsCorrent = await comparePassword({
@@ -63,16 +63,16 @@ function loginUseCase({
     });
 
     if (!passwordIsCorrent) {
-      const badRequestError = new BadRequestError([
-        {
-          message: `Wrong password for: ${email}`,
-          field: 'password',
-          forLogsOnly: true,
-        },
-        { message: 'Email and/or password is incorrect' },
-      ]);
-      logger.log('error', badRequestError.toLogs());
-      throw badRequestError;
+      throw logger.logAndReturnError(
+        new BadRequestError([
+          {
+            message: `Wrong password for: ${email}`,
+            field: 'password',
+            forLogsOnly: true,
+          },
+          { message: 'Email and/or password is incorrect' },
+        ])
+      );
     }
 
     const accessTokenEntity = generateAccessToken({
@@ -85,15 +85,13 @@ function loginUseCase({
 
     await saveToken(refreshTokenEntity);
 
-    logger.log('info', `Successful login: ${email}.`);
-    return {
-      success: true,
-      message: 'Successful login.',
-      data: {
+    return logger.logAndReturnData(
+      { message: 'Successful login', extraData: email },
+      {
         accessToken: accessTokenEntity,
         refreshToken: refreshTokenEntity,
-      },
-    };
+      }
+    );
   };
 }
 

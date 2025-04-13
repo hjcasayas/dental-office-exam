@@ -41,9 +41,7 @@ function registerUseCase({
     const result = parseParamsSchema(params);
 
     if (!result.success) {
-      const validationError = new BadRequestError(result.errors);
-      logger.log('error', validationError.toLogs());
-      throw validationError;
+      throw logger.logAndReturnError(new BadRequestError(result.errors));
     }
 
     const { email, firstName, lastName, password } = result.data;
@@ -51,19 +49,21 @@ function registerUseCase({
     const isTaken = await isEmailAlreadyTaken({ email });
 
     if (isTaken) {
-      const badRequestError = new BadRequestError([
-        { message: `Email is already taken`, field: 'email' },
-        { message: email, forLogsOnly: true },
-      ]);
-      logger.log('error', badRequestError.toLogs());
-      throw badRequestError;
+      throw logger.logAndReturnError(
+        new BadRequestError([
+          { message: `Email is already taken`, field: 'email' },
+          { message: email, forLogsOnly: true },
+        ])
+      );
     }
 
     const { hashedPassword } = await hashPassword({ password });
 
     await addUser({ firstName, lastName, email, hashedPassword });
-    logger.log('info', `Successful registration: ${email}.`);
-    return { success: true, message: 'Successful registration' };
+    return logger.logAndReturnData({
+      message: 'Successful registration',
+      extraData: email,
+    });
   };
 }
 

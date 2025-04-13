@@ -74,6 +74,23 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
         expect(level).toBe('info');
         expect(message).toBe(`Successful login: ${emailTestParam}.`);
       },
+      logAndReturnData(message, data) {
+        this.log(
+          'info',
+          message.extraData != null && message.extraData.trim() !== ''
+            ? `${message.message}: ${message.extraData}.`
+            : `${message.message}.`
+        );
+        return {
+          success: true,
+          message: message.message,
+          data,
+        };
+      },
+      logAndReturnError(error) {
+        this.log('error', error.message);
+        return error;
+      },
     };
 
     const fakeComparePasswordService: ComparePasswordService = async ({
@@ -102,10 +119,14 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
       saveToken: fakeSaveTokenService,
       logger: fakeLoggerService,
     });
-    await sut({
+
+    const sutSpy = vi.fn(sut);
+    await sutSpy({
       email: emailTestParam,
       password: passwordTestParam,
     });
+
+    expect(sutSpy).toHaveResolvedTimes(1);
     expect(getUserByEmailCallCount).toBe(1);
     expect(generateAccessTokenCallCount).toBe(1);
     expect(generateRefreshTokenCallCount).toBe(1);
@@ -177,6 +198,23 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
         expect(level).toBe('info');
         expect(message).toBe(`Successful login: ${emailTestParam}.`);
       },
+      logAndReturnData(message, data) {
+        this.log(
+          'info',
+          message.extraData != null && message.extraData.trim() !== ''
+            ? `${message.message}: ${message.extraData}.`
+            : `${message.message}.`
+        );
+        return {
+          success: true,
+          message: message.message,
+          data,
+        };
+      },
+      logAndReturnError(error) {
+        this.log('error', error.message);
+        return error;
+      },
     };
 
     const fakeSaveTokenService: SaveTokenService = async (
@@ -206,19 +244,21 @@ describe('Implementing LoginUsecase dependencies correctly.', () => {
       logger: fakeLoggerService,
     });
 
-    await sut({
+    const sutSpy = vi.fn(sut);
+    await sutSpy({
       email: emailTestParam,
       password: passwordTestParam,
     });
-    await sut({
+    await sutSpy({
       email: emailTestParam,
       password: passwordTestParam,
     });
-    await sut({
+    await sutSpy({
       email: emailTestParam,
       password: passwordTestParam,
     });
 
+    expect(sutSpy).toHaveResolvedTimes(3);
     expect(getUserByEmailCallCount).toBe(3);
     expect(generateAccessTokenCallCount).toBe(3);
     expect(generateRefreshTokenCallCount).toBe(3);
@@ -286,6 +326,23 @@ describe('Login paths.', () => {
         expect(level).toBe('error');
         expect(message).toMatch(/Bad Request/);
       },
+      logAndReturnData(message, data) {
+        this.log(
+          'info',
+          message.extraData != null && message.extraData.trim() !== ''
+            ? `${message.message}: ${message.extraData}.`
+            : `${message.message}.`
+        );
+        return {
+          success: true,
+          message: message.message,
+          data,
+        };
+      },
+      logAndReturnError(error) {
+        this.log('error', error.message);
+        return error;
+      },
     };
 
     const fakeComparePasswordService: ComparePasswordService = async ({
@@ -317,7 +374,7 @@ describe('Login paths.', () => {
 
     await expect(
       sut({ email: emailTestParam, password: passwordTestParam })
-    ).rejects.toThrowError('Email and/or password is incorrect');
+    ).rejects.toThrowError('Email and/or password is incorrect.');
     expect(getUserByEmailCallCount).toBe(1);
     expect(loggerCallCount).toBe(1);
     expect(generateAccessTokenCallCount).toBe(0);
@@ -381,6 +438,23 @@ describe('Login paths.', () => {
         loggerCallCount++;
         expect(level).toBe('error');
         expect(message).toMatch(/Bad Request/);
+      },
+      logAndReturnData(message, data) {
+        this.log(
+          'info',
+          message.extraData != null && message.extraData.trim() !== ''
+            ? `${message.message}: ${message.extraData}.`
+            : `${message.message}.`
+        );
+        return {
+          success: true,
+          message: message.message,
+          data,
+        };
+      },
+      logAndReturnError(error) {
+        this.log('error', error.message);
+        return error;
       },
     };
 
@@ -484,6 +558,23 @@ describe('Login paths.', () => {
         loggerCallCount++;
         expect(level).toBe('info');
         expect(message).toBe(`Successful login: ${emailTestParam}.`);
+      },
+      logAndReturnData(message, data) {
+        this.log(
+          'info',
+          message.extraData != null && message.extraData.trim() !== ''
+            ? `${message.message}: ${message.extraData}.`
+            : `${message.message}.`
+        );
+        return {
+          success: true,
+          message: message.message,
+          data,
+        };
+      },
+      logAndReturnError(error) {
+        this.log('error', error.message);
+        return error;
       },
     };
 

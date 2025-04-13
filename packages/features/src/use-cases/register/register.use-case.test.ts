@@ -77,6 +77,23 @@ describe('Implementing dependencies correctly', () => {
         expect(level).toBe('info');
         expect(message).toBe(`Successful registration: ${emailTestParam}.`);
       },
+      logAndReturnData(message, data) {
+        this.log(
+          'info',
+          message.extraData != null && message.extraData.trim() !== ''
+            ? `${message.message}: ${message.extraData}.`
+            : `${message.message}.`
+        );
+        return {
+          success: true,
+          message: message.message,
+          data,
+        };
+      },
+      logAndReturnError(error) {
+        this.log('error', error.message);
+        return error;
+      },
     };
 
     const sut = registerUseCase({
@@ -164,6 +181,23 @@ describe('Implementing dependencies correctly', () => {
         loggerCallCount++;
         expect(level).toBe('info');
         expect(message).toBe(`Successful registration: ${emailTestParam}.`);
+      },
+      logAndReturnData(message, data) {
+        this.log(
+          'info',
+          message.extraData != null && message.extraData.trim() !== ''
+            ? `${message.message}: ${message.extraData}.`
+            : `${message.message}.`
+        );
+        return {
+          success: true,
+          message: message.message,
+          data,
+        };
+      },
+      logAndReturnError(error) {
+        this.log('error', error.message);
+        return error;
       },
     };
 
@@ -270,6 +304,23 @@ describe('Adding User', () => {
         expect(level).toBe('error');
         expect(message).toBe('Validation error');
       },
+      logAndReturnData(message, data) {
+        this.log(
+          'info',
+          message.extraData != null && message.extraData.trim() !== ''
+            ? `${message.message}: ${message.extraData}.`
+            : `${message.message}.`
+        );
+        return {
+          success: true,
+          message: message.message,
+          data,
+        };
+      },
+      logAndReturnError(error) {
+        this.log('error', error.message);
+        return error;
+      },
     };
 
     const sut = registerUseCase({
@@ -357,7 +408,24 @@ describe('Adding User', () => {
       log: (level, message) => {
         loggerCallCount++;
         expect(level).toBe('error');
-        expect(message).toBe('Email is already registered');
+        expect(message).toBe(`Successful registration: ${emailTestParam}.`);
+      },
+      logAndReturnData(message, data) {
+        this.log(
+          'info',
+          message.extraData != null && message.extraData.trim() !== ''
+            ? `${message.message}: ${message.extraData}.`
+            : `${message.message}.`
+        );
+        return {
+          success: true,
+          message: message.message,
+          data,
+        };
+      },
+      logAndReturnError(error) {
+        this.log('error', error.message);
+        return error;
       },
     };
 
@@ -439,6 +507,23 @@ describe('Adding User', () => {
         loggerCallCount++;
         expect(level).toBe('info');
         expect(message).toBe(`Successful registration: ${emailTestParam}.`);
+      },
+      logAndReturnData(message, data) {
+        this.log(
+          'info',
+          message.extraData != null && message.extraData.trim() !== ''
+            ? `${message.message}: ${message.extraData}.`
+            : `${message.message}.`
+        );
+        return {
+          success: true,
+          message: message.message,
+          data,
+        };
+      },
+      logAndReturnError(error) {
+        this.log('error', error.message);
+        return error;
       },
     };
 
